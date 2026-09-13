@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanaware Deno PWA</title>
+    <meta property="og:title" content="Vanaware Deno PWA" />
+    <meta name="description" content="Browser-only PWA built entirely with Deno, Preact JSX, and BeerCSS" />
+    <meta property="og:description" content="Browser-only PWA built entirely with Deno, Preact JSX, and BeerCSS" />
+    <meta name="theme-color" content="#1e293b" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <!-- BeerCSS Material You styling -->
+    <link rel="stylesheet" href="/beer.min.css" />
+    <script type="module" src="/beer.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  </head>
+  <body class="dark">
+    <div id="root"></div>
+    <script type="module" src="/app.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('[PWA] Service Worker registered with scope:', reg.scope);
+          }).catch((err) => {
+            console.warn('[PWA] Service Worker registration failed:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

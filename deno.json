@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "https://esm.sh/preact@10.25.4",
+    "lib": ["deno.window", "dom", "dom.iterable"]
+  },
+  "tasks": {
+    "dev": "deno run -A dev.ts",
+    "build": "deno run -A build.ts",
+    "serve": "deno run -A server.ts",
+    "check": "deno check src/main.tsx"
+  }
+}
