@@ -1,31 +1,24 @@
-import { serveDir } from "jsr:@std/http/file-server";
+/// <reference lib="deno.ns" />
 
-const PORT = 3000;
-const HOST = "0.0.0.0";
+import { serveDir } from "@std/http/file-server";
 
-console.log(`🌐 Deno serveDir server running on http://${HOST}:${PORT}`);
+const port = Number(Deno.env.get("DEV_PORT") ?? 3000);
 
-Deno.serve({ port: PORT, hostname: HOST }, async (req: Request) => {
-  const res = await serveDir(req, {
-    fsRoot: "dist",
-    showDirListing: false,
-    enableCors: true,
-  });
-
-  // SPA / PWA fallback for text/html navigation requests
-  if (res.status === 404 && req.headers.get("accept")?.includes("text/html")) {
-    try {
-      const indexHtml = await Deno.readFile("dist/index.html");
-      return new Response(indexHtml, {
-        headers: {
-          "content-type": "text/html; charset=utf-8",
-          "cache-control": "no-cache",
-        },
-      });
-    } catch {
-      return res;
-    }
+Deno.serve({ port }, async (req) => {
+  try {
+    return await serveDir(req, {
+      fsRoot: "./build/dist",
+      showDirListing: false,
+      quiet: true,
+    });
+  } catch (err) {
+    console.warn(
+      `[STATIC] Falha ao servir arquivo estático.`,
+      err instanceof Error ? err.message : err,
+    );
+    return new Response("Internal Server Error", {
+      status: 500,
+      headers: { "content-type": "text/plain; charset=utf-8" },
+    });
   }
-
-  return res;
 });

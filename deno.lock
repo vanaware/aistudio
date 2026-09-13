@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@deno/installer-shell-setup@*": "0.3.4",
     "jsr:@std/cli@^1.0.32": "1.0.32",
     "jsr:@std/encoding@^1.0.11": "1.0.11",
     "jsr:@std/fmt@^1.0.10": "1.0.10",
@@ -8,6 +9,7 @@
     "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/html@^1.0.7": "1.0.7",
     "jsr:@std/http@*": "1.1.3",
+    "jsr:@std/http@^1.1.3": "1.1.3",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/media-types@^1.1.0": "1.1.0",
     "jsr:@std/net@^1.0.6": "1.0.6",
@@ -16,6 +18,9 @@
     "jsr:@std/streams@^1.1.2": "1.1.2"
   },
   "jsr": {
+    "@deno/installer-shell-setup@0.3.4": {
+      "integrity": "48665d1a737d487cce6874bc97bba70a5aeffa7053aca3f60df93c6fab8963b4"
+    },
     "@std/cli@1.0.32": {
       "integrity": "188b3a100d6202d64e3f5bd3d799c7fa4f6d77f92cc65eb7f641c1fa0aa92a66"
     },
@@ -75,5 +80,10 @@
     "https://esm.sh/preact@10.25.4/denonext/preact.mjs": "dbec066699281922f371202c37e70506b7f436475acbe76b2e9f03ddb1b01a56",
     "https://esm.sh/preact@10.25.4/hooks": "70f392f6cb4a1622b4d5d9263daf887a21bebbbb39dbd16b45019565617c7dd5",
     "https://esm.sh/preact@10.25.4/jsx-runtime": "b9feb114168d102397dc3d6b09e00630b9ef61c4fa98316c0b18b4c02996356b"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/http@^1.1.3"
+    ]
   }
 }

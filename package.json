@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "command -v deno >/dev/null 2>&1 || (curl -fsSL https://deno.land/install.sh | sh && ln -sf /root/.deno/bin/deno /usr/local/bin/deno); deno run -A dev.ts",
-    "build": "command -v deno >/dev/null 2>&1 || (curl -fsSL https://deno.land/install.sh | sh && ln -sf /root/.deno/bin/deno /usr/local/bin/deno); deno run -A build.ts",
-    "lint": "deno check src/main.tsx"
+    "dev": "./install-deno.sh && deno run -A build.ts && deno run -A dev.ts",
+    "build": "./install-deno.sh && deno run -A build.ts",
+    "lint": "deno check dev.ts build.ts server.ts"
   }
 }
