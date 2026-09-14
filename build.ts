@@ -17,9 +17,7 @@ export async function build() {
   console.log("🚀 [Deno Build] Iniciando empacotamento com Deno.bundle...");
 
   // Limpa e prepara os diretórios de saída
-  await Deno.remove("build/dist", { recursive: true }).catch(() => {});
   await Deno.remove("dist", { recursive: true }).catch(() => {});
-  await Deno.mkdir("build/dist", { recursive: true });
   await Deno.mkdir("dist", { recursive: true });
 
   // 1. Empacotamento dos entrypoints: src/index.html e src/sw.ts via Deno.bundle
@@ -37,7 +35,7 @@ export async function build() {
     // @ts-ignore Deno.bundle é uma API instável (--unstable-bundle)
     const result = await Deno.bundle({
       entrypoints: ["src/index.html", "src/sw.ts"],
-      outputDir: "build/dist",
+      outputDir: "dist",
       platform: "browser",
       minify: true,
     });
@@ -45,11 +43,11 @@ export async function build() {
 
     // Restaura scripts remotos no index.html final compilado
     if (externalScripts.length > 0) {
-      let outputHtml = await Deno.readTextFile("build/dist/index.html");
+      let outputHtml = await Deno.readTextFile("dist/index.html");
       for (const scriptTag of externalScripts) {
         outputHtml = outputHtml.replace("<!-- DENO_BUNDLE_REMOTE_SCRIPT -->", scriptTag);
       }
-      await Deno.writeTextFile("build/dist/index.html", outputHtml);
+      await Deno.writeTextFile("dist/index.html", outputHtml);
     }
   } finally {
     // Restaura src/index.html original intacto
@@ -57,9 +55,9 @@ export async function build() {
   }
 
   // 2. Garante disponibilidade do Service Worker em /sw.js
-  for await (const entry of Deno.readDir("build/dist")) {
+  for await (const entry of Deno.readDir("dist")) {
     if (entry.name.startsWith("sw") && entry.name.endsWith(".js") && entry.name !== "sw.js") {
-      await Deno.copyFile(`build/dist/${entry.name}`, "build/dist/sw.js");
+      await Deno.copyFile(`dist/${entry.name}`, "dist/sw.js");
     }
   }
 
@@ -67,14 +65,11 @@ export async function build() {
   try {
     const stat = await Deno.stat("public");
     if (stat.isDirectory) {
-      await copyDir("public", "build/dist");
+      await copyDir("public", "dist");
     }
   } catch {
     // public ausente, ignora
   }
-
-  // 4. Sincroniza para a pasta dist/
-  await copyDir("build/dist", "dist");
 
   console.log("✅ [Deno Build] Build concluído com sucesso!");
 }

@@ -29,7 +29,7 @@ export function initEnvironmentListeners() {
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker
-        .register("/sw.js")
+        .register("./sw.js")
         .then((reg) => {
           swActive.value = !!reg.active || !!reg.installing;
           console.log("[PWA] Service Worker registrado com sucesso:", reg.scope);

@@ -32,8 +32,16 @@ Welcome to the SyntaxMesh project! This file (`AGENTS.md`) is automatically inje
 - **Manifest**: Configuration for the installable app lives in `public/manifest.json`.
 - Assets in `public/` are automatically copied to the distribution folder during the build process.
 
-## 6. AI Studio Environment Constraints
+## 6. AI Studio Environment Constraints & Bootstrapping
 - **Port 3000**: The development server (Deno's native `file-server` in `dev.ts` / `server.ts`) MUST run on port 3000, as enforced by the AI Studio environment.
 - **HMR**: Hot Module Replacement is disabled. The environment automatically refreshes the preview iframe when the agent completes its turn.
+- **Node.js Bridge (`package.json` & `install-deno.sh`)**: Although this is a pure Deno project, the underlying AI Studio container natively expects a Node.js ecosystem. We retain `package.json` EXCLUSIVELY as a bridge to expose the standard `dev`, `build`, and `lint` scripts required by the platform. These scripts trigger `install-deno.sh` to download and bootstrap the Deno CLI on the fly during container initialization, enabling our Deno-native workflow.
+- **TaskJuggler (`tj3`)**: The environment is pre-configured to run TaskJuggler. You can execute `tj3` commands directly via the shell to process `.tjp` project files.
+
+## 7. Development Workflow & Continuous Validation
+- **Mandatory Verification**: After executing ANY task, feature request, or to-do list item, you MUST verify the project's integrity by running:
+  - Linter & Type Check: `npm run lint` (which runs `deno check` under the hood).
+  - Tests: `deno test -A --unstable-bundle tests/`.
+- **Proactive Unit Testing**: Whenever you implement new functions, utilities, or complex logic, you MUST proactively create unit tests for them using the `@std/testing/bdd` standard. Do not wait for the user to explicitly ask for tests.
 
 By following these guidelines, we maintain a fast, dependency-free, and cohesive Deno/Preact environment without the overhead of Node.js toolchains or complex CSS bundlers.

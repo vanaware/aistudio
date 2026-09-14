@@ -7,7 +7,7 @@ const port = Number(Deno.env.get("DEV_PORT") ?? 3000);
 Deno.serve({ port }, async (req) => {
   try {
     return await serveDir(req, {
-      fsRoot: "./build/dist",
+      fsRoot: "./dist",
       showDirListing: false,
       quiet: true,
     });

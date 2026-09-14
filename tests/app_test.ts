@@ -6,16 +6,16 @@ describe("Build Script", () => {
   it("bundles src/index.html and src/sw.ts with Deno.bundle", async () => {
     await build();
 
-    // Verifica se o index.html existe em build/dist
-    const indexStat = await Deno.stat("build/dist/index.html");
+    // Verifica se o index.html existe em dist
+    const indexStat = await Deno.stat("dist/index.html");
     assertEquals(indexStat.isFile, true);
 
     // Verifica se sw.js foi gerado a partir do bundle de sw.ts
-    const swStat = await Deno.stat("build/dist/sw.js");
+    const swStat = await Deno.stat("dist/sw.js");
     assertEquals(swStat.isFile, true);
 
     // Lê o conteúdo do HTML e verifica título e ausência de tags <style>
-    const htmlContent = await Deno.readTextFile("build/dist/index.html");
+    const htmlContent = await Deno.readTextFile("dist/index.html");
     assert(htmlContent.includes("<title>SyntaxMesh</title>"));
     assert(!htmlContent.includes("<style>"));
     assert(!htmlContent.includes("style="));
@@ -24,18 +24,18 @@ describe("Build Script", () => {
     assert(htmlContent.includes('rel="manifest"'));
 
     // Lê o sw.js compilado e verifica o conteúdo minificado
-    const swContent = await Deno.readTextFile("build/dist/sw.js");
+    const swContent = await Deno.readTextFile("dist/sw.js");
     assert(swContent.includes("syntaxmesh-pwa-v1"));
   });
 
-  it("copies public assets and manifest into build/dist", async () => {
-    const iconStat = await Deno.stat("build/dist/icon.svg");
+  it("copies public assets and manifest into dist", async () => {
+    const iconStat = await Deno.stat("dist/icon.svg");
     assertEquals(iconStat.isFile, true);
 
-    const manifestStat = await Deno.stat("build/dist/manifest.json");
+    const manifestStat = await Deno.stat("dist/manifest.json");
     assertEquals(manifestStat.isFile, true);
 
-    const manifest = JSON.parse(await Deno.readTextFile("build/dist/manifest.json"));
+    const manifest = JSON.parse(await Deno.readTextFile("dist/manifest.json"));
     assertEquals(manifest.name, "SyntaxMesh");
   });
 });
