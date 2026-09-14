@@ -6,7 +6,7 @@ Welcome to the SyntaxMesh project! This file (`AGENTS.md`) is automatically inje
 - **Deno Only**: This project runs entirely on Deno. 
 - **NO Node.js or Local NPM**: Do NOT use `npm install`, do NOT create a `node_modules` directory locally, and do NOT rely on Node.js specific APIs.
 - **Dependency Management**: All dependencies are managed exclusively via `deno.json` using `npm:` and `jsr:` specifiers (e.g., `npm:preact`, `jsr:@std/testing`).
-- **Bundling**: We use Deno's native (and unstable) bundler via the `build.ts` script (`deno run -A --unstable-bundle build.ts`). This script parses the `src/index.html` and generates the outputs in `build/dist/` and `dist/`. 
+- **Bundling**: We use Deno's native (and unstable) bundler via the `build.ts` script (`deno run -A --unstable-bundle build.ts`). This script parses `src/index.html` and generates the final output exclusively in the `dist/` directory.
 
 ## 2. Framework & State Management
 - **Preact**: Use Preact (not React). The configuration in `deno.json` maps `jsx` to `preact`.
@@ -27,10 +27,12 @@ Welcome to the SyntaxMesh project! This file (`AGENTS.md`) is automatically inje
 - **No Direct Deno.test**: Do NOT use the raw `Deno.test()` syntax for new tests.
 - **Command**: Run tests using `deno test -A --unstable-bundle tests/`.
 
-## 5. Offline & PWA
+## 5. Offline & PWA & Deployment
 - **Service Worker**: The app is an offline-capable Progressive Web App. Changes to caching logic should be made in `src/sw.ts`.
 - **Manifest**: Configuration for the installable app lives in `public/manifest.json`.
 - Assets in `public/` are automatically copied to the distribution folder during the build process.
+- **Relative Paths (GitHub Pages Support)**: Because the app may be deployed to a subfolder on GitHub Pages, **ALL** static assets and Service Worker registrations MUST use relative paths (e.g., `./manifest.json` and `navigator.serviceWorker.register("./sw.js")`) instead of absolute root paths (`/`).
+- **CI/CD**: The project contains a GitHub Actions workflow (`.github/workflows/gh-pages.yml`) that automatically builds and deploys the contents of the `dist/` directory to GitHub Pages.
 
 ## 6. AI Studio Environment Constraints & Bootstrapping
 - **Port 3000**: The development server (Deno's native `file-server` in `dev.ts` / `server.ts`) MUST run on port 3000, as enforced by the AI Studio environment.
