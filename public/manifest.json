@@ -1,12 +1,12 @@
 {
-  "name": "Vanaware Deno PWA",
-  "short_name": "DenoPWA",
-  "description": "Pure Deno + Preact + BeerCSS Progressive Web App running in AI Studio",
+  "name": "SyntaxMesh",
+  "short_name": "SyntaxMesh",
+  "description": "Progressive Web App built with Deno, Preact, Signals and pure BeerCSS",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#1e293b",
+  "background_color": "#141218",
+  "theme_color": "#6750a4",
   "icons": [
     {
       "src": "/icon.svg",

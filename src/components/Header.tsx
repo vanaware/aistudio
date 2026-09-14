@@ -1,53 +1,31 @@
-import { h } from "https://esm.sh/preact@10.25.4";
-import { MigrationSummary } from "../types.ts";
+import { isOnline, installPrompt, currentThemeMode, promptInstallPWA, toggleThemeMode } from "../store.ts";
 
-interface HeaderProps {
-  summary: MigrationSummary;
-}
-
-export function Header({ summary }: HeaderProps) {
+export function Header() {
   return (
-    <header className="top surface shadow">
-      <nav className="responsive">
-        <div className="max">
-          <div className="row wrap items-center gap">
-            <span className="chip primary">
-              <i>bolt</i>
-              <span>Native Deno 2.9</span>
-            </span>
-            <span className="chip border">
-              <i>install_mobile</i>
-              <span>PWA Offline Ready</span>
-            </span>
-            <span className="chip border">
-              <i>palette</i>
-              <span>BeerCSS Pure Styling</span>
-            </span>
-          </div>
-          <h4 className="no-margin primary-text">{summary.repoName}</h4>
-          <p className="small-text">{summary.description}</p>
-        </div>
+    <nav class="top border fill primary-container">
+      <button class="circle transparent">
+        <i>lock</i>
+      </button>
+      <h6 class="max bold">SyntaxMesh</h6>
 
-        <div className="row wrap items-center gap">
-          <span className="chip surface">
-            <i>dns</i>
-            <span>Port {summary.port}</span>
-          </span>
-          <span className="chip surface">
-            <i>verified</i>
-            <span>MIT License</span>
-          </span>
-          <a
-            href={summary.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button border round"
-          >
-            <i>open_in_new</i>
-            <span>GitHub</span>
-          </a>
-        </div>
-      </nav>
-    </header>
+      {/* Online / Offline status chip */}
+      <span class={isOnline.value ? "chip success" : "chip error"}>
+        <i>{isOnline.value ? "wifi" : "wifi_off"}</i>
+        <span>{isOnline.value ? "Online" : "Offline"}</span>
+      </span>
+
+      {/* PWA Install button */}
+      {installPrompt.value && (
+        <button class="chip primary" onClick={promptInstallPWA}>
+          <i>download</i>
+          <span>Instalar PWA</span>
+        </button>
+      )}
+
+      {/* Theme Toggle Button */}
+      <button class="circle transparent" onClick={toggleThemeMode} title={`Tema atual: ${currentThemeMode.value}`}>
+        <i>{currentThemeMode.value === "dark" ? "dark_mode" : currentThemeMode.value === "light" ? "light_mode" : "brightness_auto"}</i>
+      </button>
+    </nav>
   );
 }

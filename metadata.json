@@ -1,6 +1,6 @@
 {
-  "name": "Vanaware Deno PWA",
-  "description": "Browser-only PWA built entirely with Deno, Preact JSX, and BeerCSS",
+  "name": "SyntaxMesh",
+  "description": "Progressive Web App built with Deno, Preact, Signals and pure BeerCSS",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

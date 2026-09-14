@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "./install-deno.sh && deno run -A build.ts && deno run -A dev.ts",
-    "build": "./install-deno.sh && deno run -A build.ts",
-    "lint": "deno check dev.ts build.ts server.ts"
+    "dev": "./install-deno.sh && deno run -A --unstable-bundle build.ts && deno run -A dev.ts",
+    "build": "./install-deno.sh && deno run -A --unstable-bundle build.ts",
+    "lint": "deno check --unstable-bundle dev.ts build.ts server.ts src/sw.ts src/main.tsx src/components/*.tsx src/store.ts tests/app_test.ts",
+    "test": "deno test -A --unstable-bundle tests/"
   }
 }

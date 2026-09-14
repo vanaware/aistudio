@@ -1,7 +1,12 @@
-import { h, render } from "https://esm.sh/preact@10.25.4";
-import { App } from "./App.tsx";
+import { render } from "preact";
+import { initEnvironmentListeners } from "./store.ts";
+import { App } from "./components/App.tsx";
 
-const root = document.getElementById("root");
-if (root) {
-  render(<App />, root);
+// Initialize side effects (PWA, network)
+initEnvironmentListeners();
+
+// Mount Preact Application
+const rootElement = document.getElementById("app");
+if (rootElement) {
+  render(<App />, rootElement);
 }
