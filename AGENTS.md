@@ -21,7 +21,7 @@ Welcome to the SyntaxMesh project! This file (`AGENTS.md`) is automatically inje
 - **No Custom CSS**: Avoid writing custom CSS files or inline `style="..."` attributes. Rely purely on BeerCSS semantic HTML tags (e.g., `<article>`, `<nav>`) and utility classes (e.g., `grid`, `s12`, `m6`, `chip`, `circle`, `primary-container`, `active`).
 - **Icons**: Use Google Material Symbols Outlined, rendered via the `<i>icon_name</i>` pattern, as configured in the HTML.
 
-## 4. Testing Standard (ADR 008)
+## 4. Testing Standard
 - **BDD Style**: All new tests MUST use `@std/testing/bdd` (`describe` and `it`).
 - **Assertions**: Use `@std/assert` (`assertEquals`, `assert`, etc.).
 - **No Direct Deno.test**: Do NOT use the raw `Deno.test()` syntax for new tests.
