@@ -185,12 +185,12 @@ Texto normal aqui.`;
     assertEquals(doc, null, "Embedded doc should return null since docs are migrated to public/articles");
   });
 
-  it("verifies Navbar and Sidebar render articles dynamically and indent sub-pages", async () => {
+  it("verifies Navbar and Sidebar render articles dynamically with clean margin indentation and no arrow icons", async () => {
     const navbarSrc = await Deno.readTextFile("src/components/Navbar.js");
     assert(navbarSrc.includes("articles.value"), "Navbar must read articles from reactive signal");
     assert(navbarSrc.includes("art.depth"), "Navbar must inspect art.depth for indentation");
     assert(navbarSrc.includes("left-margin"), "Navbar must use left-margin indentation class for sub-pages");
-    assert(navbarSrc.includes("subdirectory_arrow_right"), "Navbar must show sub-page indicator icon");
+    assert(!navbarSrc.includes("subdirectory_arrow_right"), "Navbar must NOT use indentation arrow icons");
     assert(!navbarSrc.includes("const QUICK_ARTICLES"), "Navbar must not have hardcoded QUICK_ARTICLES");
     assert(!navbarSrc.includes("const SECTIONS ="), "Navbar must not have hardcoded SECTIONS");
 
@@ -198,6 +198,7 @@ Texto normal aqui.`;
     assert(sidebarSrc.includes("articles.value"), "Sidebar must read articles from reactive signal");
     assert(sidebarSrc.includes("item.depth"), "Sidebar must inspect item.depth for indentation");
     assert(sidebarSrc.includes("left-margin"), "Sidebar must use left-margin indentation class for sub-pages");
+    assert(!sidebarSrc.includes("subdirectory_arrow_right"), "Sidebar must NOT use indentation arrow icons");
     assert(!sidebarSrc.includes("const SECTIONS ="), "Sidebar must not have hardcoded SECTIONS");
   });
 
@@ -213,13 +214,15 @@ Texto normal aqui.`;
     assert(htmlContent.includes('<a href="guia.md">'), "index.html must contain link to guia.md");
   });
 
-  it("verifies Content.js implements clean layout: discreet breadcrumb, title/author/date, content, sub-pages, and Made with mdBlog footer", async () => {
+  it("verifies Content.js implements clean layout: discreet breadcrumb, title/author/date, wrapped sub-pages without indentation icons, and Made with mdBlog footer", async () => {
     const contentSrc = await Deno.readTextFile("src/components/Content.js");
 
-    // 1. Discreet breadcrumbs
+    // 1. Discreet breadcrumbs with tight spacing and responsive wrapping
     assert(contentSrc.includes("breadcrumbs"), "Content.js must build breadcrumbs");
     assert(contentSrc.includes("chevron_right"), "Content.js must use subtle chevron_right divider");
     assert(contentSrc.includes("small-text surface-variant-text"), "Breadcrumb must be subtle and discreet");
+    assert(contentSrc.includes("no-space"), "Breadcrumb must use no-space to avoid excessive spacing between items");
+    assert(contentSrc.includes("row wrap"), "Breadcrumb must have wrap to fit on small screens");
 
     // 2. Header with title, author, date
     assert(contentSrc.includes("<header"), "Content.js must have clean article header");
@@ -233,7 +236,12 @@ Texto normal aqui.`;
     assert(subpagesIdx > 0, "Content.js must render sub-pages list");
     assert(articleIdx < subpagesIdx, "Article content must be rendered BEFORE sub-pages list");
 
-    // 4. Clean footer with only 'Made with mdBlog'
+    // 4. Sub-pages: no indentation icons, and text wrapped to avoid overflow
+    assert(!contentSrc.includes("subdirectory_arrow_right"), "Sub-pages must not use indentation icons");
+    assert(contentSrc.includes("bold small-text wrap"), "Sub-page titles must be compact and wrapped");
+    assert(contentSrc.includes("row wrap"), "Sub-page cards must wrap on small screens");
+
+    // 5. Clean footer with only 'Made with mdBlog'
     assert(contentSrc.includes("Made with mdBlog"), "Footer must contain 'Made with mdBlog'");
     assert(!contentSrc.includes("dangerouslySetInnerHTML"), "Footer must not contain debug strings");
   });

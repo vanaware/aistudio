@@ -106,18 +106,21 @@ export function Content() {
 
   return html`
     <main class="responsive max padding">
-      <!-- 1. Breadcrumb discreto -->
+      <!-- 1. Breadcrumb discreto e compacto com wrap -->
       ${breadcrumbs.length > 1 ? html`
-        <nav class="row items-center gap-small small-text surface-variant-text margin-bottom">
+        <nav class="row wrap no-space items-center small-text surface-variant-text margin-bottom">
           ${breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
+            const label = (idx === 0 && (crumb.name === "index.md" || crumb.path.endsWith("/index.md")))
+              ? "Início"
+              : crumb.title;
             return html`
-              ${idx > 0 ? html`<i class="tiny">chevron_right</i>` : null}
+              ${idx > 0 ? html`<i class="tiny tiny-margin opacity-50">chevron_right</i>` : null}
               <a
-                class=${isLast ? "bold primary-text" : "surface-variant-text wave"}
+                class=${`wrap ${isLast ? "bold primary-text" : "surface-variant-text wave"}`}
                 onClick=${() => navigateTo(crumb.path)}
               >
-                ${crumb.title}
+                ${label}
               </a>
             `;
           })}
@@ -126,7 +129,7 @@ export function Content() {
 
       <!-- 2. Cabeçalho limpo: Título, autor e data -->
       <header class="margin-bottom-large padding-bottom border-bottom">
-        <h3 class="bold no-margin-bottom">${title}</h3>
+        <h3 class="bold no-margin-bottom wrap">${title}</h3>
         ${(author || date) ? html`
           <div class="row wrap items-center gap-medium small-text surface-variant-text margin-top-small">
             ${author ? html`
@@ -153,27 +156,30 @@ export function Content() {
       <!-- 4. Lista de Sub-páginas (exibida após o conteúdo do artigo) -->
       ${currentArticle && currentArticle.children && currentArticle.children.length > 0 ? html`
         <section class="margin-top-large padding-top border-top">
-          <div class="row items-center gap-small margin-bottom">
-            <i class="primary-text">subdirectory_arrow_right</i>
-            <h6 class="no-margin bold">Sub-páginas desta seção (${currentArticle.children.length})</h6>
-          </div>
+          <p class="bold small-text surface-variant-text uppercase margin-bottom-small">
+            Sub-páginas (${currentArticle.children.length})
+          </p>
           <div class="column gap-small">
             ${currentArticle.children.map((sub) => html`
               <a
                 key=${sub.path}
-                class="row items-center justify-between border round padding surface-container wave"
+                class="row wrap items-center justify-between border round padding-small surface-container wave gap-small"
                 onClick=${() => navigateTo(sub.path)}
               >
-                <div class="row items-center gap-small">
-                  <i class="primary-text">${sub.icon || "article"}</i>
-                  <div>
-                    <div class="bold">${sub.title}</div>
-                    ${sub.description ? html`<div class="small-text surface-variant-text">${sub.description}</div>` : null}
+                <div class="row wrap items-center gap-small max min">
+                  <i class="primary-text small">${sub.icon || "article"}</i>
+                  <div class="max min wrap">
+                    <div class="bold small-text wrap">${sub.title}</div>
+                    ${sub.description ? html`
+                      <div class="small-text surface-variant-text wrap no-margin">
+                        ${sub.description}
+                      </div>
+                    ` : null}
                   </div>
                 </div>
                 <div class="row items-center gap-small">
-                  ${sub.badge ? html`<span class="badge none primary">${sub.badge}</span>` : null}
-                  <i class="surface-variant-text">chevron_right</i>
+                  ${sub.badge ? html`<span class="badge tiny primary">${sub.badge}</span>` : null}
+                  <i class="surface-variant-text small">chevron_right</i>
                 </div>
               </a>
             `)}

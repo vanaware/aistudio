@@ -37,14 +37,9 @@ export function Navbar() {
                 class=${`${isActive ? "active bold primary-text" : ""} ${indentClass}`}
                 onClick=${() => navigateTo(art.path)}
               >
-                ${depth > 0 ? html`
-                  <i class="small surface-variant-text" title=${`Sub-página (Nível ${depth})`}>
-                    ${depth > 1 ? "keyboard_double_arrow_right" : "subdirectory_arrow_right"}
-                  </i>
-                ` : null}
                 <i>${art.icon || "article"}</i>
                 <div class="max truncate">${art.title}</div>
-                ${art.badge ? html`<span class="badge none primary">${art.badge}</span>` : depth > 0 ? html`<span class="badge tiny surface-variant">${`N${depth}`}</span>` : null}
+                ${art.badge ? html`<span class="badge none primary">${art.badge}</span>` : null}
               </a>
             `;
           })}

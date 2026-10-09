@@ -64,12 +64,6 @@ export function Sidebar() {
                       sidebarOpen.value = false;
                     }
                   }}
-                >
-                  ${depth > 0 ? html`
-                    <i class="tiny surface-variant-text" title=${`Sub-página (Nível ${depth})`}>
-                      ${depth > 1 ? "keyboard_double_arrow_right" : "subdirectory_arrow_right"}
-                    </i>
-                  ` : null}
                   <i
                     class=${`small ${
                       isActive ? "primary-text" : "surface-variant-text"
@@ -80,8 +74,6 @@ export function Sidebar() {
                   <span class="max truncate small-text">${item.title}</span>
                   ${item.badge ? html`
                     <span class="badge none primary">${item.badge}</span>
-                  ` : depth > 0 ? html`
-                    <span class="badge tiny surface-variant">${`N${depth}`}</span>
                   ` : null}
                 </a>
               `;
