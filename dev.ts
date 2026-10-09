@@ -3,7 +3,7 @@
 import { serveDir } from "@std/http/file-server";
 
 // No ambiente AI Studio/Cloud Run, o proxy reverso escuta exclusivamente na porta 3000
-const port = Number(Deno.env.get("DEV_PORT") ?? 3000);
+const port = Number(Deno.env.get("PORT") ?? Deno.env.get("DEV_PORT") ?? 3000);
 
 async function findActiveBundles(): Promise<{ indexBundle?: string; chunkBundle?: string }> {
   try {
@@ -24,7 +24,7 @@ async function findActiveBundles(): Promise<{ indexBundle?: string; chunkBundle?
   }
 }
 
-Deno.serve({ port }, async (req) => {
+Deno.serve({ port, hostname: "0.0.0.0" }, async (req) => {
   try {
     const url = new URL(req.url);
     const pathname = url.pathname;

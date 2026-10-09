@@ -1,13 +1,26 @@
 #!/usr/bin/env bash
 set -e
 
+safe_apt_install() {
+  local max_retries=5
+  local count=0
+  while [ $count -lt $max_retries ]; do
+    if DEBIAN_FRONTEND=noninteractive apt-get update -y && \
+       DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+         -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" "$@"; then
+      return 0
+    fi
+    echo "apt-get busy or locked, retrying in 3 seconds ($((count + 1))/$max_retries)..."
+    sleep 3
+    count=$((count + 1))
+  done
+  return 1
+}
+
 echo "📦 Checking and installing zip/unzip prerequisites..."
 if ! command -v zip >/dev/null 2>&1 || ! command -v unzip >/dev/null 2>&1; then
   echo "Installing zip and unzip via apt-get..."
-  DEBIAN_FRONTEND=noninteractive apt-get update -y && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
-    zip unzip
+  safe_apt_install zip unzip
 fi
 
 echo "🦕 Checking Deno installation..."
@@ -23,10 +36,7 @@ echo "✅ Deno ready: $(deno --version | head -n 1)"
 echo "🤹 Checking TaskJuggler (tj3) installation..."
 if ! command -v tj3 >/dev/null 2>&1; then
   echo "Installing ruby, ruby-dev, build-essential..."
-  DEBIAN_FRONTEND=noninteractive apt-get update -y && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
-    ruby ruby-dev build-essential
+  safe_apt_install ruby ruby-dev build-essential
   echo "Installing taskjuggler gem..."
   gem install taskjuggler --no-document
 fi

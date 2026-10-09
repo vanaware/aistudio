@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "bash ./install-deno.sh && deno run -A --unstable-bundle build.ts && deno run -A dev.ts",
     "build": "bash ./install-deno.sh && deno run -A --unstable-bundle build.ts",
+    "start": "bash ./install-deno.sh && deno run -A server.ts",
     "lint": "deno check --unstable-bundle dev.ts build.ts server.ts src/sw.ts src/main.js src/lib/md-transpiler.ts tests/*.ts",
     "test": "deno test -A --unstable-bundle tests/"
   }

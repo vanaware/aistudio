@@ -16,8 +16,8 @@ export function wireToVNode(
   wire: Wire,
   options: WireToVNodeOptions = {},
 ): ComponentChildren {
-  const registry = { ...defaultRegistry, ...options.registry };
-  const islandRegistry = options.islands ?? {};
+  const registry: Record<string, any> = { ...defaultRegistry, ...options.registry };
+  const islandRegistry: Record<string, any> = options.islands ?? {};
 
   if (wire === null || wire === undefined) {
     return null;
