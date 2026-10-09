@@ -2,6 +2,7 @@ import type { DocConfig, IO } from "../types.ts";
 import type { WireDoc } from "../wire.ts";
 import { parseMarkdown } from "./parse.ts";
 import { mdastToWire } from "./to-wire.ts";
+import { parseFrontmatter } from "./frontmatter.ts";
 
 /**
  * Pure transformation pipeline: takes raw markdown and returns a complete WireDoc.
@@ -11,15 +12,22 @@ export function processMarkdown(
   url: string,
   islands: Set<string> = new Set(),
 ): WireDoc {
-  const root = parseMarkdown(markdown);
-  const { wire, title } = mdastToWire(root, islands);
+  const { frontmatter, body } = parseFrontmatter(markdown);
+  const root = parseMarkdown(body);
+  const { wire, title: astTitle } = mdastToWire(root, islands);
+
+  // Use frontmatter.title if defined, fallback to AST heading title
+  const finalTitle = (typeof frontmatter.title === "string" && frontmatter.title.trim())
+    ? frontmatter.title.trim()
+    : astTitle;
 
   return {
     wire,
-    title,
+    title: finalTitle,
     raw: markdown,
     url,
     renderedAt: Date.now(),
+    frontmatter,
   };
 }
 

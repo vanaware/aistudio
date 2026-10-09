@@ -18,32 +18,54 @@ export function createBrowserIO(options: CacheIOOptions = {}): IO {
     async readText(url: string): Promise<string> {
       const cleanPath = url.replace(/[?#].*$/, "");
 
-      // 1. Attempt network / Service Worker fetch
-      try {
-        let target = url;
-        if (target.startsWith("/") && typeof window !== "undefined") {
-          target = `.${target}`;
-        }
-        const separator = target.includes("?") ? "&" : "?";
-        const fetchUrl = `${target}${separator}_md_raw=1`;
-
-        let response: Response;
-        try {
-          response = await fetch(fetchUrl);
-        } catch {
-          // Fallback to raw url if relative fetch failed
-          const fallback = `${url}${url.includes("?") ? "&" : "?"}_md_raw=1`;
-          response = await fetch(fallback);
-        }
-
-        if (response.ok) {
-          return await response.text();
-        }
-      } catch (err) {
-        console.info(`[io] Network fetch bypass for ${url}, switching to embedded fallback:`, err);
+      // 1. Candidate paths to try (/articles/ and /docs/)
+      const candidatePaths = [cleanPath];
+      if (cleanPath.startsWith("/docs/")) {
+        candidatePaths.push(cleanPath.replace("/docs/", "/articles/"));
+      } else if (cleanPath.startsWith("/articles/")) {
+        candidatePaths.push(cleanPath.replace("/articles/", "/docs/"));
       }
 
-      // 2. Embedded markdown fallback: guarantees 100% reliability in sandbox/preview
+      for (const candidate of candidatePaths) {
+        try {
+          let target = candidate;
+          if (target.startsWith("/") && typeof window !== "undefined") {
+            target = `.${target}`;
+          }
+          const separator = target.includes("?") ? "&" : "?";
+          const fetchUrl = `${target}${separator}_md_raw=1`;
+
+          let response: Response;
+          try {
+            response = await fetch(fetchUrl);
+          } catch {
+            const fallback = `${candidate}${candidate.includes("?") ? "&" : "?"}_md_raw=1`;
+            response = await fetch(fallback);
+          }
+
+          if (response.ok) {
+            const text = await response.text();
+            if (useIdb) {
+              set(`raw:${cleanPath}`, text).catch(() => {});
+            }
+            return text;
+          }
+        } catch {
+          // Continue to next candidate
+        }
+      }
+
+      // 2. Check IndexedDB cached raw text if offline
+      if (useIdb) {
+        try {
+          const cached = await get<string>(`raw:${cleanPath}`);
+          if (cached) return cached;
+        } catch {
+          // ignore
+        }
+      }
+
+      // 3. Embedded markdown fallback if any
       const embedded = getEmbeddedDoc(cleanPath) ?? getEmbeddedDoc(url);
       if (embedded) {
         return embedded;

@@ -11,7 +11,7 @@ function safeJsonSerialize(data: unknown): string {
  * Generates the full HTML shell for first-paint navigation.
  * Emits BeerCSS, manifest, and an inline <script id="__md_wire"> payload for zero-latency initial rendering.
  */
-export function defaultShell(doc: WireDoc, bundlePath = "./main.js"): string {
+export function defaultShell(doc: WireDoc, bundlePath = "./mdblog.js"): string {
   const serializedWire = safeJsonSerialize(doc);
 
   return `<!DOCTYPE html>

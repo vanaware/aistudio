@@ -1,50 +1,27 @@
 import { html } from "htm/preact";
-import { useSignal } from "@preact/signals";
 import {
   currentDoc,
   currentPath,
   isLoading,
   errorMessage,
-  viewMode,
-  parseTimeMs,
+  articles,
 } from "../state.ts";
 import { wireToVNode } from "../render/from-wire.ts";
 import { islands } from "../render/islands/index.js";
-import { countWireNodes, countWireIslands } from "../plugin/wire.ts";
 import { navigateTo } from "../router.ts";
-
-const QUICK_ARTICLES = [
-  { path: "/docs/README.md", label: "🏠 Início", desc: "Visão Geral" },
-  { path: "/docs/guia.md", label: "🧪 Post: Guia & Ilhas", desc: "Demonstração prática" },
-  { path: "/docs/PLANO_MIGRACAO_HTML_ES.md", label: "⚡ Post: HTML+ES (.js)", desc: "Arquitetura limpa" },
-  { path: "/docs/ARQUITETURA_WIRE_FORMAT.md", label: "⚙️ Wire AST Spec", desc: "Contrato JSON" },
-  { path: "/docs/GUIA_DE_ISLANDS.md", label: "🏝️ Islands HTML+ES", desc: "Manual técnico" },
-];
 
 export function Content() {
   const doc = currentDoc.value;
   const path = currentPath.value;
   const loading = isLoading.value;
   const error = errorMessage.value;
-  const mode = viewMode.value;
-  const copied = useSignal(false);
-
-  function copyText(text) {
-    if (typeof navigator !== "undefined" && navigator.clipboard) {
-      navigator.clipboard.writeText(text);
-      copied.value = true;
-      setTimeout(() => {
-        copied.value = false;
-      }, 2000);
-    }
-  }
 
   if (loading && !doc) {
     return html`
       <main class="responsive max padding center-align margin-top">
         <progress class="circle large"></progress>
         <p class="margin-top surface-variant-text">
-          Carregando artigo e renderizando via Wire Format AST...
+          Carregando...
         </p>
       </main>
     `;
@@ -59,13 +36,12 @@ export function Content() {
             <div>
               <h5 class="no-margin bold">Falha ao carregar o artigo</h5>
               <p class="margin-top">${error}</p>
-              <p class="small-text surface-variant-text">Caminho: ${path}</p>
             </div>
           </div>
           <div class="margin-top">
             <button
               class="button primary"
-              onClick=${() => navigateTo("/docs/README.md")}
+              onClick=${() => navigateTo(articles.value[0]?.path || "/articles/index.md")}
             >
               <i>home</i> Ir para Início
             </button>
@@ -83,166 +59,132 @@ export function Content() {
     `;
   }
 
-  const nodeCount = countWireNodes(doc.wire);
-  const islandCount = countWireIslands(doc.wire);
+  const currentArticle = articles.value.find((a) => a.path === path);
+
+  // Monta o breadcrumb discreto a partir da hierarquia do artigo
+  const breadcrumbs = [];
+  let curr = currentArticle;
+  while (curr) {
+    breadcrumbs.unshift(curr);
+    if (!curr.parentPath || curr.parentPath === curr.path) break;
+    curr = articles.value.find((a) => a.path === curr.parentPath);
+  }
+
+  const rootArticle = articles.value.find(
+    (a) => a.depth === 0 || a.name === "index.md" || a.path.endsWith("/index.md"),
+  );
+  if (rootArticle && breadcrumbs.length > 0 && breadcrumbs[0].path !== rootArticle.path) {
+    breadcrumbs.unshift(rootArticle);
+  }
+
+  // Título, autor e data extraídos do frontmatter ou metadados
+  const title = doc.frontmatter?.title || currentArticle?.title || doc.title || "Artigo";
+  const author = doc.frontmatter?.author || currentArticle?.author;
+  const date = doc.frontmatter?.date || currentArticle?.date;
+
+  // Evita duplicar o título h1 do topo do markdown se já estiver no cabeçalho
+  let renderWire = doc.wire;
+  if (
+    renderWire &&
+    renderWire.t === "f" &&
+    Array.isArray(renderWire.c) &&
+    renderWire.c.length > 0
+  ) {
+    const firstNode = renderWire.c[0];
+    if (
+      firstNode &&
+      firstNode.t === "c" &&
+      firstNode.n === "Heading" &&
+      (firstNode.p?.depth === 1 || firstNode.p?.depth === "1")
+    ) {
+      renderWire = {
+        ...renderWire,
+        c: renderWire.c.slice(1),
+      };
+    }
+  }
 
   return html`
     <main class="responsive max padding">
-      <!-- Quick Article Switcher Bar -->
-      <div class="margin-bottom padding-bottom border-bottom">
-        <div class="row wrap items-center justify-between gap margin-bottom">
-          <span class="bold small-text surface-variant-text uppercase row wrap items-center gap-small">
-            <i>auto_stories</i>
-            <span class="m l">Artigos em Destaque:</span>
-            <span class="s">Destaques:</span>
-          </span>
-          <span class="chip small success bold">
-            <i>verified</i> 100% HTML+ES (.js)
-          </span>
-        </div>
-
-        <div class="row wrap gap-small">
-          ${QUICK_ARTICLES.map((art) => {
-            const isCurrent = path === art.path;
+      <!-- 1. Breadcrumb discreto -->
+      ${breadcrumbs.length > 1 ? html`
+        <nav class="row items-center gap-small small-text surface-variant-text margin-bottom">
+          ${breadcrumbs.map((crumb, idx) => {
+            const isLast = idx === breadcrumbs.length - 1;
             return html`
-              <button
-                key=${art.path}
-                class=${`chip small ${isCurrent ? "primary-container bold" : "surface-variant"}`}
-                onClick=${() => navigateTo(art.path)}
+              ${idx > 0 ? html`<i class="tiny">chevron_right</i>` : null}
+              <a
+                class=${isLast ? "bold primary-text" : "surface-variant-text wave"}
+                onClick=${() => navigateTo(crumb.path)}
               >
-                <span>${art.label}</span>
-              </button>
+                ${crumb.title}
+              </a>
             `;
           })}
-        </div>
-      </div>
-
-      <!-- Article Navigation Tabs -->
-      <nav class="tabs scroll border-bottom margin-bottom">
-        <a
-          class=${`row items-center gap-small ${mode === "preview" ? "active bold primary-text" : ""}`}
-          onClick=${() => (viewMode.value = "preview")}
-        >
-          <i>visibility</i>
-          <span>
-            <span class="s">Artigo</span>
-            <span class="m l">Artigo Renderizado (Preact + Islands)</span>
-          </span>
-        </a>
-        <a
-          class=${`row items-center gap-small ${mode === "ast" ? "active bold primary-text" : ""}`}
-          onClick=${() => (viewMode.value = "ast")}
-        >
-          <i>schema</i>
-          <span>
-            <span class="s">Wire AST</span>
-            <span class="m l">Wire Format AST (JSON)</span>
-          </span>
-        </a>
-        <a
-          class=${`row items-center gap-small ${mode === "raw" ? "active bold primary-text" : ""}`}
-          onClick=${() => (viewMode.value = "raw")}
-        >
-          <i>description</i>
-          <span>
-            <span class="s">Markdown</span>
-            <span class="m l">Markdown Original (.md)</span>
-          </span>
-        </a>
-      </nav>
-
-      <!-- Metrics and Info Banner -->
-      <div class="row wrap items-center justify-between gap margin-bottom surface-container-low round padding-small border">
-        <div class="row wrap items-center gap-small">
-          <span class="chip small surface-container-high truncate" title=${doc.url}>
-            <i>description</i> <strong>${doc.url}</strong>
-          </span>
-          <span class="chip small primary-container">
-            <i>account_tree</i> <strong>${nodeCount}</strong> nós
-          </span>
-          <span class="chip small secondary-container">
-            <i>widgets</i> <strong>${islandCount}</strong> Ilhas Reativas
-          </span>
-          <span class="chip small surface-variant">
-            <i>speed</i> <strong>${parseTimeMs.value} ms</strong>
-          </span>
-        </div>
-
-        <div class="row wrap items-center gap-small">
-          <span class="small-text surface-variant-text">
-            Cache: <strong>IndexedDB (idb-keyval)</strong>
-          </span>
-        </div>
-      </div>
-
-      <!-- Article Content View -->
-      ${mode === "preview" ? html`
-        <article class="no-border no-padding wrap">
-          ${wireToVNode(doc.wire, { islands })}
-
-          <footer class="margin-top padding-top border-top row wrap items-center justify-between surface-variant-text small-text gap">
-            <div class="row wrap items-center gap-small">
-              <i>security</i>
-              <span>Zero <code>dangerouslySetInnerHTML</code> • 100% Preact VNodes</span>
-            </div>
-            <div class="wrap">
-              Processado em: ${new Date(doc.renderedAt).toLocaleTimeString()}
-            </div>
-          </footer>
-        </article>
+        </nav>
       ` : null}
 
-      ${mode === "ast" ? html`
-        <article class="border round medium-padding surface-container">
-          <div class="row wrap items-center justify-between gap margin-bottom border-bottom padding-bottom">
-            <div class="max wrap">
-              <h6 class="no-margin bold row items-center gap-small">
-                <i>schema</i> Árvore JSON do Wire Format
-              </h6>
-              <p class="small-text surface-variant-text margin-top wrap">
-                Nós serializáveis gerados pelo pipeline (elementos, componentes e ilhas).
-              </p>
-            </div>
-            <button
-              class="chip primary small"
-              onClick=${() => copyText(JSON.stringify(doc.wire, null, 2))}
-            >
-              <i>${copied.value ? "check" : "content_copy"}</i>
-              <span>${copied.value ? "Copiado!" : "Copiar JSON"}</span>
-            </button>
+      <!-- 2. Cabeçalho limpo: Título, autor e data -->
+      <header class="margin-bottom-large padding-bottom border-bottom">
+        <h3 class="bold no-margin-bottom">${title}</h3>
+        ${(author || date) ? html`
+          <div class="row wrap items-center gap-medium small-text surface-variant-text margin-top-small">
+            ${author ? html`
+              <span class="row items-center gap-tiny">
+                <i class="tiny">person</i>
+                <span>${author}</span>
+              </span>
+            ` : null}
+            ${date ? html`
+              <span class="row items-center gap-tiny">
+                <i class="tiny">calendar_today</i>
+                <span>${date}</span>
+              </span>
+            ` : null}
           </div>
+        ` : null}
+      </header>
 
-          <pre class="border round padding surface-container-lowest scroll wrap">
-            <code>${JSON.stringify(doc.wire, null, 2)}</code>
-          </pre>
-        </article>
-      ` : null}
+      <!-- 3. Conteúdo do artigo -->
+      <article class="no-border no-padding wrap">
+        ${wireToVNode(renderWire, { islands })}
+      </article>
 
-      ${mode === "raw" ? html`
-        <article class="border round medium-padding surface-container">
-          <div class="row wrap items-center justify-between gap margin-bottom border-bottom padding-bottom">
-            <div class="max wrap">
-              <h6 class="no-margin bold row items-center gap-small">
-                <i>description</i> Arquivo Markdown Original
-              </h6>
-              <p class="small-text surface-variant-text margin-top wrap">
-                Conteúdo bruto obtido diretamente do arquivo .md.
-              </p>
-            </div>
-            <button
-              class="chip primary small"
-              onClick=${() => copyText(doc.raw)}
-            >
-              <i>${copied.value ? "check" : "content_copy"}</i>
-              <span>${copied.value ? "Copiado!" : "Copiar Markdown"}</span>
-            </button>
+      <!-- 4. Lista de Sub-páginas (exibida após o conteúdo do artigo) -->
+      ${currentArticle && currentArticle.children && currentArticle.children.length > 0 ? html`
+        <section class="margin-top-large padding-top border-top">
+          <div class="row items-center gap-small margin-bottom">
+            <i class="primary-text">subdirectory_arrow_right</i>
+            <h6 class="no-margin bold">Sub-páginas desta seção (${currentArticle.children.length})</h6>
           </div>
-
-          <pre class="border round padding surface-container-lowest scroll wrap">
-            <code>${doc.raw}</code>
-          </pre>
-        </article>
+          <div class="column gap-small">
+            ${currentArticle.children.map((sub) => html`
+              <a
+                key=${sub.path}
+                class="row items-center justify-between border round padding surface-container wave"
+                onClick=${() => navigateTo(sub.path)}
+              >
+                <div class="row items-center gap-small">
+                  <i class="primary-text">${sub.icon || "article"}</i>
+                  <div>
+                    <div class="bold">${sub.title}</div>
+                    ${sub.description ? html`<div class="small-text surface-variant-text">${sub.description}</div>` : null}
+                  </div>
+                </div>
+                <div class="row items-center gap-small">
+                  ${sub.badge ? html`<span class="badge none primary">${sub.badge}</span>` : null}
+                  <i class="surface-variant-text">chevron_right</i>
+                </div>
+              </a>
+            `)}
+          </div>
+        </section>
       ` : null}
+
+      <!-- 5. Rodapé simplificado -->
+      <footer class="margin-top-large padding-top padding-bottom border-top center-align surface-variant-text small-text">
+        <span>Made with mdBlog</span>
+      </footer>
     </main>
   `;
 }

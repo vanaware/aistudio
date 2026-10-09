@@ -1,9 +1,13 @@
 import { html } from "htm/preact";
-import { isOffline, isSWActive, sidebarOpen } from "../state.ts";
+import { isOffline, isSWActive, sidebarOpen, articles, currentPath } from "../state.ts";
 import { ThemeToggle } from "../render/islands/ThemeToggle.js";
 import { SearchBox } from "../render/islands/SearchBox.js";
+import { navigateTo } from "../router.ts";
 
 export function Navbar() {
+  const current = currentPath.value;
+  const list = articles.value;
+
   return html`
     <nav class="top surface-container border-bottom sticky">
       <button
@@ -15,7 +19,39 @@ export function Navbar() {
       </button>
 
       <i class="primary-text bold">menu_book</i>
-      <h6 class="max bold no-margin truncate">mdBlog</h6>
+      <h6 class="bold no-margin">mdBlog</h6>
+
+      <!-- Menu Dropdown Dinâmico de Artigos do Blog (BeerCSS nativo) -->
+      <button class="chip primary-container bold">
+        <i>auto_stories</i>
+        <span>Artigos (${list.length})</span>
+        <i>arrow_drop_down</i>
+        <menu class="min left scroll max-height">
+          ${list.map((art) => {
+            const depth = art.depth || 0;
+            const indentClass = depth === 1 ? "left-margin" : depth >= 2 ? "large-margin left-margin" : "";
+            const isActive = current === art.path;
+            return html`
+              <a
+                key=${art.path}
+                class=${`${isActive ? "active bold primary-text" : ""} ${indentClass}`}
+                onClick=${() => navigateTo(art.path)}
+              >
+                ${depth > 0 ? html`
+                  <i class="small surface-variant-text" title=${`Sub-página (Nível ${depth})`}>
+                    ${depth > 1 ? "keyboard_double_arrow_right" : "subdirectory_arrow_right"}
+                  </i>
+                ` : null}
+                <i>${art.icon || "article"}</i>
+                <div class="max truncate">${art.title}</div>
+                ${art.badge ? html`<span class="badge none primary">${art.badge}</span>` : depth > 0 ? html`<span class="badge tiny surface-variant">${`N${depth}`}</span>` : null}
+              </a>
+            `;
+          })}
+        </menu>
+      </button>
+
+      <div class="max"></div>
 
       <div class="row items-center gap">
         <!-- Status badges - versão detalhada em telas médias/grandes -->
@@ -51,7 +87,7 @@ export function Navbar() {
 
         <!-- Busca com suporte responsivo nativo BeerCSS (visível em telas m e l) -->
         <div class="m l">
-          <${SearchBox} placeholder="Buscar docs..." />
+          <${SearchBox} placeholder="Buscar artigos..." />
         </div>
 
         <${ThemeToggle} />

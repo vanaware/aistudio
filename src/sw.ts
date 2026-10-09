@@ -14,6 +14,9 @@ const STATIC_ASSETS: string[] = [
   "./icon.svg",
   "./beer.min.css",
   "./beer.min.js",
+  "./mdblog.js",
+  "./main.js",
+  "./lib/md-transpiler.js",
 ];
 
 const io = createBrowserIO({
@@ -22,10 +25,10 @@ const io = createBrowserIO({
 });
 
 const handleDocFetch = createSWFetchHandler(io, {
-  basePath: "/docs",
+  basePath: "/articles",
   cacheTTLSeconds: 60,
   islands: islandNamesSet,
-  bundlePath: "./main.js",
+  bundlePath: "./mdblog.js",
 });
 
 self.addEventListener("install", (event: ExtendableEvent) => {

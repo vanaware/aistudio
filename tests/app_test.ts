@@ -14,9 +14,16 @@ describe("Build Script", () => {
     const swStat = await Deno.stat("dist/sw.js");
     assertEquals(swStat.isFile, true);
 
-    // Lê o conteúdo do HTML e verifica título e ausência de tags <style>
+    // Verifica se mdblog.js e main.js foram gerados a partir do bundle da biblioteca
+    const mdblogStat = await Deno.stat("dist/mdblog.js");
+    assertEquals(mdblogStat.isFile, true);
+    const mainStat = await Deno.stat("dist/main.js");
+    assertEquals(mainStat.isFile, true);
+
+    // Lê o conteúdo do HTML e verifica script mdblog.js, título e ausência de tags <style>
     const htmlContent = await Deno.readTextFile("dist/index.html");
     assert(htmlContent.includes("<title>mdBlog</title>"));
+    assert(htmlContent.includes('src="./mdblog.js"'));
     assert(!htmlContent.includes("<style>"));
     assert(!htmlContent.includes("style="));
 
@@ -27,9 +34,19 @@ describe("Build Script", () => {
     const libStat = await Deno.stat("dist/lib/md-transpiler.js");
     assertEquals(libStat.isFile, true);
 
-    // Lê o sw.js compilado e verifica o conteúdo minificado
+    // Lê o sw.js compilado e verifica o conteúdo
     const swContent = await Deno.readTextFile("dist/sw.js");
     assert(swContent.includes("mdblog-pwa-v1"));
+
+    // Verifica se o arquivo public/sw.js padrão demonstra o uso da biblioteca empacotada
+    const publicSw = await Deno.readTextFile("public/sw.js");
+    assert(publicSw.includes('from "./lib/md-transpiler.js"'), "sw.js must show how it imports bundled library");
+    assert(publicSw.includes("createSWFetchHandler"), "sw.js must use createSWFetchHandler");
+
+    // Verifica se src/main.js inclui a biblioteca com fallback quando não existe app.js
+    const mainSrc = await Deno.readTextFile("src/main.js");
+    assert(mainSrc.includes("export {"), "main.js must export library components and utilities");
+    assert(mainSrc.includes("ComponentToMount"), "main.js must support mounting built-in App if app.js is absent");
   });
 
   it("copies public assets and manifest into dist", async () => {
@@ -38,6 +55,12 @@ describe("Build Script", () => {
 
     const manifestStat = await Deno.stat("dist/manifest.json");
     assertEquals(manifestStat.isFile, true);
+
+    const articlesStat = await Deno.stat("dist/articles");
+    assertEquals(articlesStat.isDirectory, true);
+
+    const readmeStat = await Deno.stat("dist/articles/README.md");
+    assertEquals(readmeStat.isFile, true);
 
     const manifest = JSON.parse(await Deno.readTextFile("dist/manifest.json"));
     assertEquals(manifest.name, "mdBlog");

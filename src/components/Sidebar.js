@@ -1,28 +1,9 @@
 import { html } from "htm/preact";
-import { currentPath, sidebarOpen } from "../state.ts";
-
-const SECTIONS = [
-  {
-    group: "Publicações & Artigos",
-    items: [
-      { path: "/docs/README.md", title: "Visão Geral do mdBlog", icon: "article" },
-      { path: "/docs/guia.md", title: "Post: Guia & Ilhas Reativas", icon: "science", badge: "Ilhas" },
-      { path: "/docs/PLANO_MIGRACAO_HTML_ES.md", title: "Post: Arquitetura HTML+ES (.js)", icon: "code", badge: "Novo" },
-    ],
-  },
-  {
-    group: "Documentação & Especificação",
-    items: [
-      { path: "/docs/ARQUITETURA_WIRE_FORMAT.md", title: "Especificação Wire Format (AST)", icon: "schema" },
-      { path: "/docs/FLUXOS_E_CICLO_DE_VIDA.md", title: "Fluxos de Navegação e Cache", icon: "sync" },
-      { path: "/docs/GUIA_DE_ISLANDS.md", title: "Manual de Islands HTML+ES", icon: "widgets" },
-      { path: "/docs/PLANO_DESENVOLVIMENTO.md", title: "Plano de Desenvolvimento", icon: "checklist" },
-    ],
-  },
-];
+import { currentPath, sidebarOpen, articles } from "../state.ts";
 
 export function Sidebar() {
   const current = currentPath.value;
+  const list = articles.value;
 
   return html`
     <!-- Overlay escurecedor nativo do BeerCSS para fechar gaveta no mobile -->
@@ -54,48 +35,59 @@ export function Sidebar() {
         </button>
       </div>
 
-      <!-- Lista de seções e artigos -->
+      <!-- Lista dinâmica de artigos do blog -->
       <div class="small-padding">
-        ${SECTIONS.map((sec) => html`
-          <div key=${sec.group} class="small-margin bottom-margin">
-            <div class="small-text surface-variant-text bold uppercase tiny-margin bottom-margin left-padding truncate">
-              ${sec.group}
-            </div>
-            <div class="column">
-              ${sec.items.map((item) => {
-                const isActive = current === item.path;
-                return html`
-                  <a
-                    key=${item.path}
-                    href="#${item.path}"
-                    class=${`row items-center wave round small-padding tiny-margin bottom-margin ${
-                      isActive
-                        ? "primary-container bold"
-                        : "transparent surface-text"
-                    }`}
-                    onClick=${() => {
-                      if (typeof window !== "undefined" && window.innerWidth < 992) {
-                        sidebarOpen.value = false;
-                      }
-                    }}
-                  >
-                    <i
-                      class=${`small ${
-                        isActive ? "primary-text" : "surface-variant-text"
-                      }`}
-                    >
-                      ${item.icon}
-                    </i>
-                    <span class="max truncate small-text">${item.title}</span>
-                    ${item.badge ? html`
-                      <span class="badge none primary">${item.badge}</span>
-                    ` : null}
-                  </a>
-                `;
-              })}
-            </div>
+        <div class="small-margin bottom-margin">
+          <div class="row items-center justify-between tiny-margin bottom-margin left-padding right-padding">
+            <span class="small-text surface-variant-text bold uppercase truncate">
+              Publicações (${list.length})
+            </span>
+            <span class="chip tiny surface-variant">Dinâmico</span>
           </div>
-        `)}
+
+          <div class="column">
+            ${list.map((item) => {
+              const isActive = current === item.path;
+              const depth = item.depth || 0;
+              const indentClass = depth === 1 ? "left-margin" : depth >= 2 ? "large-margin left-margin" : "";
+              return html`
+                <a
+                  key=${item.path}
+                  href="#${item.path}"
+                  class=${`row items-center wave round small-padding tiny-margin bottom-margin ${
+                    isActive
+                      ? "primary-container bold"
+                      : "transparent surface-text"
+                  } ${indentClass}`}
+                  onClick=${() => {
+                    if (typeof window !== "undefined" && window.innerWidth < 992) {
+                      sidebarOpen.value = false;
+                    }
+                  }}
+                >
+                  ${depth > 0 ? html`
+                    <i class="tiny surface-variant-text" title=${`Sub-página (Nível ${depth})`}>
+                      ${depth > 1 ? "keyboard_double_arrow_right" : "subdirectory_arrow_right"}
+                    </i>
+                  ` : null}
+                  <i
+                    class=${`small ${
+                      isActive ? "primary-text" : "surface-variant-text"
+                    }`}
+                  >
+                    ${item.icon || "article"}
+                  </i>
+                  <span class="max truncate small-text">${item.title}</span>
+                  ${item.badge ? html`
+                    <span class="badge none primary">${item.badge}</span>
+                  ` : depth > 0 ? html`
+                    <span class="badge tiny surface-variant">${`N${depth}`}</span>
+                  ` : null}
+                </a>
+              `;
+            })}
+          </div>
+        </div>
       </div>
     </nav>
   `;

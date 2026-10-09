@@ -66,6 +66,7 @@ Deno.serve({ port, hostname: "0.0.0.0" }, async (req) => {
     // 3. Resolução e fallback para hashes de scripts antigos
     if (
       pathname === "/main.js" ||
+      pathname === "/mdblog.js" ||
       (pathname.includes("/index-") && pathname.endsWith(".js"))
     ) {
       const exists = await Deno.stat(`./dist${pathname}`).then(() => true).catch(() => false);
@@ -101,9 +102,32 @@ Deno.serve({ port, hostname: "0.0.0.0" }, async (req) => {
       }
     }
 
+    if (pathname === "/articles" || pathname === "/articles/") {
+      const accept = req.headers.get("accept") ?? "";
+      if (accept.includes("application/json")) {
+        const fileNames: string[] = [];
+        try {
+          for await (const entry of Deno.readDir("./dist/articles")) {
+            if (entry.isFile && entry.name.endsWith(".md")) {
+              fileNames.push(entry.name);
+            }
+          }
+        } catch {
+          // ignore
+        }
+        return new Response(JSON.stringify(fileNames), {
+          status: 200,
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-cache",
+          },
+        });
+      }
+    }
+
     return await serveDir(req, {
       fsRoot: "./dist",
-      showDirListing: false,
+      showDirListing: true,
       quiet: true,
     });
   } catch (err) {

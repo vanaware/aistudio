@@ -14,7 +14,7 @@ export interface SWPluginOptions extends DocConfig {
  */
 export function createSWFetchHandler(io: IO, options: SWPluginOptions = {}) {
   const basePath = options.basePath ?? "/docs";
-  const bundlePath = options.bundlePath ?? "./main.js";
+  const bundlePath = options.bundlePath ?? "./mdblog.js";
 
   return function handleFetch(event: FetchEvent): boolean {
     const request = event.request;
