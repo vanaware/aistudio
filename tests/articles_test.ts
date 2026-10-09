@@ -185,12 +185,11 @@ Texto normal aqui.`;
     assertEquals(doc, null, "Embedded doc should return null since docs are migrated to public/articles");
   });
 
-  it("verifies Navbar and Sidebar render articles dynamically with clean margin indentation and no arrow icons", async () => {
+  it("verifies Navbar and Sidebar render articles dynamically, with Sidebar handling indented tree and Navbar without select box", async () => {
     const navbarSrc = await Deno.readTextFile("src/components/Navbar.js");
     assert(navbarSrc.includes("articles.value"), "Navbar must read articles from reactive signal");
-    assert(navbarSrc.includes("art.depth"), "Navbar must inspect art.depth for indentation");
-    assert(navbarSrc.includes("left-margin"), "Navbar must use left-margin indentation class for sub-pages");
-    assert(!navbarSrc.includes("subdirectory_arrow_right"), "Navbar must NOT use indentation arrow icons");
+    assert(!navbarSrc.includes("<select"), "Navbar must not use a select box");
+    assert(!navbarSrc.includes("<menu"), "Navbar must not use a dropdown select box");
     assert(!navbarSrc.includes("const QUICK_ARTICLES"), "Navbar must not have hardcoded QUICK_ARTICLES");
     assert(!navbarSrc.includes("const SECTIONS ="), "Navbar must not have hardcoded SECTIONS");
 

@@ -7,6 +7,7 @@ import { navigateTo } from "../router.ts";
 export function Navbar() {
   const current = currentPath.value;
   const list = articles.value;
+  const topSections = list.filter((art) => art.depth <= 1);
 
   return html`
     <nav class="top surface-container border-bottom sticky">
@@ -18,33 +19,34 @@ export function Navbar() {
         <i>menu</i>
       </button>
 
-      <i class="primary-text bold">menu_book</i>
-      <h6 class="bold no-margin">mdBlog</h6>
+      <a
+        class="row items-center gap-small wave transparent surface-text no-margin"
+        onClick=${() => navigateTo(articles.value[0]?.path || "/articles/index.md")}
+        title="Página Inicial"
+      >
+        <i class="primary-text bold">menu_book</i>
+        <h6 class="bold no-margin">mdBlog</h6>
+      </a>
 
-      <!-- Menu Dropdown Dinâmico de Artigos do Blog (BeerCSS nativo) -->
-      <button class="chip primary-container bold">
-        <i>auto_stories</i>
-        <span>Artigos (${list.length})</span>
-        <i>arrow_drop_down</i>
-        <menu class="min left scroll max-height">
-          ${list.map((art) => {
-            const depth = art.depth || 0;
-            const indentClass = depth === 1 ? "left-margin" : depth >= 2 ? "large-margin left-margin" : "";
-            const isActive = current === art.path;
-            return html`
-              <a
-                key=${art.path}
-                class=${`${isActive ? "active bold primary-text" : ""} ${indentClass}`}
-                onClick=${() => navigateTo(art.path)}
-              >
-                <i>${art.icon || "article"}</i>
-                <div class="max truncate">${art.title}</div>
-                ${art.badge ? html`<span class="badge none primary">${art.badge}</span>` : null}
-              </a>
-            `;
-          })}
-        </menu>
-      </button>
+      <!-- Links diretos de navegação na barra (sem select box ou menu dropdown) -->
+      <div class="row items-center gap-small m l margin-left">
+        ${topSections.map((art) => {
+          const isActive = current === art.path;
+          return html`
+            <a
+              key=${art.path}
+              class=${`row items-center gap-tiny wave round small-padding small-text ${
+                isActive ? "bold primary-text primary-container" : "surface-text"
+              }`}
+              onClick=${() => navigateTo(art.path)}
+              title=${art.title}
+            >
+              <i class="tiny">${art.icon || "article"}</i>
+              <span>${art.title.replace(/^[^\w\s]*\s*/, "")}</span>
+            </a>
+          `;
+        })}
+      </div>
 
       <div class="max"></div>
 
@@ -64,11 +66,7 @@ export function Navbar() {
           <span class="chip primary-container small bold m l" title="Service Worker ativo">
             <i>bolt</i> SW Ativo
           </span>
-        ` : html`
-          <span class="chip surface-variant small bold m l" title="Executando no cliente via pipeline direto">
-            <i>memory</i> Fallback Local
-          </span>
-        `}
+        ` : null}
 
         <!-- Indicador compacto exclusivo para mobile (telas pequenas .s) -->
         <span
