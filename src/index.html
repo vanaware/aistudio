@@ -3,8 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SyntaxMesh</title>
+    <title>mdBlog</title>
     <meta name="description" content="Progressive Web App built with Deno, Preact, Signals and pure BeerCSS" />
+    <meta property="og:title" content="mdBlog" />
+    <meta property="og:description" content="Progressive Web App built with Deno, Preact, Signals and pure BeerCSS" />
     <meta name="theme-color" content="#6750a4" />
 
     <!-- Web App Manifest -->
@@ -14,22 +16,43 @@
     <link rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>" />
 
-    <!-- BeerCSS Framework v5.0.3 (CSS + Custom Elements JS) -->
+    <!-- Auto-recovery from stale Service Worker caches -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+          var src = e.target.src || e.target.href;
+          if (src && !sessionStorage.getItem('sw_recovered')) {
+            sessionStorage.setItem('sw_recovered', '1');
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(regs) {
+                return Promise.all(regs.map(function(r) { return r.unregister(); }));
+              }).then(function() {
+                if ('caches' in window) {
+                  caches.keys().then(function(keys) {
+                    return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+                  }).then(function() {
+                    window.location.reload();
+                  });
+                } else {
+                  window.location.reload();
+                }
+              });
+            }
+          }
+        }
+      }, true);
+    </script>
+
+    <!-- BeerCSS Framework v5.0.3 (Local offline assets) -->
+    <link rel="stylesheet" href="./beer.min.css" />
+    <script type="module" src="./beer.min.js"></script>
+
+    <!-- Google Material Symbols Outlined -->
     <link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/beercss@5.0.3/dist/cdn/beer.min.css" />
-    <script type="module"
-      src="https://cdn.jsdelivr.net/npm/beercss@5.0.3/dist/cdn/beer.min.js"></script>
-
-    <!-- Material Dynamic Colors -->
-    <script type="module"
-      src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.4/dist/cdn/material-dynamic-colors.min.js"></script>
-
-    <!-- Material Dynamic Fonts -->
-    <script type="module"
-      src="https://cdn.jsdelivr.net/npm/material-dynamic-fonts@0.0.3/dist/cdn/material-dynamic-fonts.min.js?font=Material Symbols Outlined&selector=i"></script>
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   </head>
   <body class="auto">
     <div id="app"></div>
-    <script type="module" src="./main.tsx"></script>
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

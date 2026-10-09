@@ -1,6 +1,6 @@
 {
-  "name": "SyntaxMesh",
-  "short_name": "SyntaxMesh",
+  "name": "mdBlog",
+  "short_name": "mdBlog",
   "description": "Progressive Web App built with Deno, Preact, Signals and pure BeerCSS",
   "start_url": "/",
   "scope": "/",

@@ -20,45 +20,44 @@ export async function build() {
   await Deno.remove("dist", { recursive: true }).catch(() => {});
   await Deno.mkdir("dist", { recursive: true });
 
-  // 1. Empacotamento dos entrypoints: src/index.html e src/sw.ts via Deno.bundle
-  // Salvaguardamos temporariamente as tags <script src="https://..."> para o Deno.bundle
-  const originalHtml = await Deno.readTextFile("src/index.html");
-  const remoteScriptRegex = /<script\b[^>]*src=["\']https?:\/\/[^>]*>[\s\S]*?<\/script>/gi;
-  const externalScripts = originalHtml.match(remoteScriptRegex) || [];
+  // 1. Empacotamento dos entrypoints: src/main.js, src/sw.ts e src/lib/md-transpiler.ts via Deno.bundle
+  // @ts-ignore Deno.bundle é uma API instável (--unstable-bundle)
+  const result = await Deno.bundle({
+    entrypoints: ["src/main.js", "src/sw.ts", "src/lib/md-transpiler.ts"],
+    outputDir: "dist",
+    platform: "browser",
+    minify: true,
+  });
+  console.log("📦 [Deno.bundle result]:", result);
 
-  try {
-    if (externalScripts.length > 0) {
-      const sanitizedHtml = originalHtml.replace(remoteScriptRegex, "<!-- DENO_BUNDLE_REMOTE_SCRIPT -->");
-      await Deno.writeTextFile("src/index.html", sanitizedHtml);
-    }
+  // Copia o index.html da aplicação
+  await Deno.copyFile("src/index.html", "dist/index.html");
 
-    // @ts-ignore Deno.bundle é uma API instável (--unstable-bundle)
-    const result = await Deno.bundle({
-      entrypoints: ["src/index.html", "src/sw.ts"],
-      outputDir: "dist",
-      platform: "browser",
-      minify: true,
-    });
-    console.log("📦 [Deno.bundle result]:", result);
-
-    // Restaura scripts remotos no index.html final compilado
-    if (externalScripts.length > 0) {
-      let outputHtml = await Deno.readTextFile("dist/index.html");
-      for (const scriptTag of externalScripts) {
-        outputHtml = outputHtml.replace("<!-- DENO_BUNDLE_REMOTE_SCRIPT -->", scriptTag);
-      }
-      await Deno.writeTextFile("dist/index.html", outputHtml);
-    }
-  } finally {
-    // Restaura src/index.html original intacto
-    await Deno.writeTextFile("src/index.html", originalHtml);
-  }
-
-  // 2. Garante disponibilidade do Service Worker em /sw.js
+  // 2. Garante disponibilidade do Service Worker em /sw.js, do bundle em /main.js e da lib de transpilação em /lib/md-transpiler.js
+  await Deno.mkdir("dist/lib", { recursive: true });
   for await (const entry of Deno.readDir("dist")) {
     if (entry.name.startsWith("sw") && entry.name.endsWith(".js") && entry.name !== "sw.js") {
       await Deno.copyFile(`dist/${entry.name}`, "dist/sw.js");
     }
+    if (entry.name.startsWith("index-") && entry.name.endsWith(".js")) {
+      await Deno.copyFile(`dist/${entry.name}`, "dist/main.js");
+    }
+    if (entry.name.startsWith("md-transpiler") && entry.name.endsWith(".js")) {
+      await Deno.copyFile(`dist/${entry.name}`, "dist/lib/md-transpiler.js");
+      await Deno.copyFile(`dist/${entry.name}`, "dist/md-transpiler.js");
+    }
+  }
+
+  // Se o Deno.bundle colocou em dist/lib/md-transpiler-*.js
+  try {
+    for await (const entry of Deno.readDir("dist/lib")) {
+      if (entry.name.startsWith("md-transpiler") && entry.name.endsWith(".js") && entry.name !== "md-transpiler.js") {
+        await Deno.copyFile(`dist/lib/${entry.name}`, "dist/lib/md-transpiler.js");
+        await Deno.copyFile(`dist/lib/${entry.name}`, "dist/md-transpiler.js");
+      }
+    }
+  } catch {
+    // ignora
   }
 
   // 3. Copia assets estáticos da pasta public/
@@ -69,6 +68,16 @@ export async function build() {
     }
   } catch {
     // public ausente, ignora
+  }
+
+  // 4. Copia arquivos de documentação para dist/docs
+  try {
+    const stat = await Deno.stat("docs");
+    if (stat.isDirectory) {
+      await copyDir("docs", "dist/docs");
+    }
+  } catch {
+    // docs ausente, ignora
   }
 
   console.log("✅ [Deno Build] Build concluído com sucesso!");

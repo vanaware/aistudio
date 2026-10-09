@@ -13,7 +13,7 @@ Welcome to the SyntaxMesh project! This file (`AGENTS.md`) is automatically inje
 - **State via Signals**: All reactive state MUST use `@preact/signals`. 
   - Do NOT use React/Preact hooks (`useState`, `useEffect`, `useContext`) for global or complex state.
   - Global state, actions, and derived states (`computed`) should be centralized in `src/store.ts`.
-- **Component Architecture**: Keep UI components modularized inside `src/components/`. `src/main.tsx` is exclusively the application entry point and bootstrap file.
+- **Component Architecture**: Keep UI components modularized inside `src/components/`. `src/main.js` is exclusively the application entry point and bootstrap file. All UI components use pure HTML+ES (`htm/preact`) with `.js` extensions for native browser execution.
 
 ## 3. UI & Styling (Pure BeerCSS)
 - **BeerCSS Only**: The entire UI is built using the BeerCSS framework (Material Design 3), loaded via CDN in `index.html`.
