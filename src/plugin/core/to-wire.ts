@@ -54,35 +54,34 @@ export function mdastToWire(
       }
 
       case "paragraph": {
-        // Check if paragraph contains an island directive pattern, e.g. ::Counter{start:5}
+        // Suporte a ilhas dinâmicas por arquivo no markdown: ::NomeDoArquivo.js{start: 5} ou ::NomeDoArquivo.js
         const text = extractText(node).trim();
-        const islandDirectiveMatch = text.match(/^::([A-Za-z0-9_-]+)(?:\{([\s\S]*)\})?$/);
+        const islandDirectiveMatch = text.match(/^::([A-Za-z0-9_.-]+)(?:\{([\s\S]*)\})?$/);
         if (islandDirectiveMatch) {
-          const islandName = islandDirectiveMatch[1];
-          if (islands.has(islandName)) {
-            let props: Record<string, unknown> = {};
-            if (islandDirectiveMatch[2]) {
-              const raw = islandDirectiveMatch[2].trim();
-              const wrapped = raw.startsWith("{") ? raw : `{${raw}}`;
+          const rawTarget = islandDirectiveMatch[1];
+          const islandFileName = rawTarget.endsWith(".js") ? rawTarget : `${rawTarget}.js`;
+          let props: Record<string, unknown> = {};
+          if (islandDirectiveMatch[2]) {
+            const raw = islandDirectiveMatch[2].trim();
+            const wrapped = raw.startsWith("{") ? raw : `{${raw}}`;
+            try {
+              props = JSON.parse(wrapped);
+            } catch {
               try {
-                props = JSON.parse(wrapped);
+                // Quote unquoted object keys (e.g. start: 20 -> "start": 20)
+                const quoted = wrapped.replace(/([{,]\s*)([a-zA-Z0-9_$]+)\s*:/g, '$1"$2":');
+                props = JSON.parse(quoted);
               } catch {
-                try {
-                  // Quote unquoted object keys (e.g. start: 20 -> "start": 20)
-                  const quoted = wrapped.replace(/([{,]\s*)([a-zA-Z0-9_$]+)\s*:/g, '$1"$2":');
-                  props = JSON.parse(quoted);
-                } catch {
-                  // Ignore parse error, use empty props
-                }
+                // Ignore parse error, use empty props
               }
             }
-            return {
-              t: "i",
-              n: islandName,
-              p: sanitizeProps(props),
-              c: [],
-            } as WireIsland;
           }
+          return {
+            t: "i",
+            n: islandFileName,
+            p: sanitizeProps(props),
+            c: [],
+          } as WireIsland;
         }
 
         const children = transformChildren(node.children);
@@ -132,24 +131,23 @@ export function mdastToWire(
         // {"start": 10}
         // ```
         const lang = node.lang?.trim() ?? "";
-        if (lang.startsWith("island:") || islands.has(lang)) {
-          const islandName = lang.startsWith("island:") ? lang.slice(7).trim() : lang;
-          if (islands.has(islandName)) {
-            let props: Record<string, unknown> = {};
-            if (node.value.trim()) {
-              try {
-                props = JSON.parse(node.value.trim());
-              } catch {
-                props = { raw: node.value };
-              }
+        if (lang.startsWith("island:")) {
+          const rawIsland = lang.slice(7).trim();
+          const islandFileName = rawIsland.endsWith(".js") ? rawIsland : `${rawIsland}.js`;
+          let props: Record<string, unknown> = {};
+          if (node.value.trim()) {
+            try {
+              props = JSON.parse(node.value.trim());
+            } catch {
+              props = { raw: node.value };
             }
-            return {
-              t: "i",
-              n: islandName,
-              p: sanitizeProps(props),
-              c: [],
-            } as WireIsland;
           }
+          return {
+            t: "i",
+            n: islandFileName,
+            p: sanitizeProps(props),
+            c: [],
+          } as WireIsland;
         }
 
         return {

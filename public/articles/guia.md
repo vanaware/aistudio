@@ -26,13 +26,13 @@ Este documento é processado pelo parser Markdown, transformado em nós JSON ser
 
 Abaixo temos uma ilha reativa construída com **HTML+ES (`htm/preact` + ES Modules)**, executada diretamente no navegador sem compilação prévia pelo bundle:
 
-::Counter{start: 10, step: 1, label: "Contador Interativo Reativo"}
+::Counter.js{start: 10, step: 1, label: "Contador Interativo Reativo"}
 
 ### Segunda Ilha (Configuração Diferente)
 
 Você pode instanciar múltiplas ilhas com propriedades independentes isoladas via `@preact/signals`:
 
-```island:Counter
+```island:Counter.js
 {
   "start": 100,
   "step": 5,
