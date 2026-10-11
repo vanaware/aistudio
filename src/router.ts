@@ -1,4 +1,4 @@
-import { currentPath, currentDoc, isLoading, errorMessage, parseTimeMs, viewMode, loadArticles, articles } from "./state.ts";
+import { currentPath, currentDoc, isLoading, errorMessage, parseTimeMs, viewMode } from "./state.ts";
 import { mdFetch } from "./plugin/adapters/client.ts";
 import { createBrowserIO } from "./plugin/core/io.ts";
 import { islandNamesSet } from "./render/islands/manifest.ts";
@@ -11,7 +11,7 @@ const io = createBrowserIO({
 });
 
 const config = {
-  basePath: "/articles",
+  basePath: "/docs",
   cacheTTLSeconds: 60,
   islands: islandNamesSet,
 };
@@ -21,8 +21,8 @@ export async function navigateTo(path: string): Promise<void> {
   if (cleanPath.startsWith("#")) {
     cleanPath = cleanPath.slice(1);
   }
-  if (!cleanPath || cleanPath === "/" || cleanPath === "/docs" || cleanPath === "/articles" || cleanPath === "/articles/index") {
-    cleanPath = "/articles/index.md";
+  if (!cleanPath || cleanPath === "/") {
+    cleanPath = "/docs/guia.md";
   }
   if (!cleanPath.startsWith("/")) {
     cleanPath = `/${cleanPath}`;
@@ -60,21 +60,12 @@ export async function navigateTo(path: string): Promise<void> {
 export function initRouter(): void {
   if (typeof window === "undefined") return;
 
-  // Carrega dinamicamente a lista de artigos do blog
-  loadArticles().then(() => {
-    // Se a rota atual não foi definida, vai para o primeiro artigo
-    const hash = window.location.hash;
-    if (!hash && articles.value.length > 0) {
-      navigateTo(articles.value[0].path);
-    }
-  }).catch(() => {});
-
   function handleRoute() {
     const hash = window.location.hash;
     if (hash) {
       navigateTo(hash);
     } else {
-      navigateTo("/articles/index.md");
+      navigateTo("/docs/guia.md");
     }
   }
 
@@ -86,8 +77,9 @@ export function initRouter(): void {
     try {
       const doc = JSON.parse(preRenderedScript.textContent);
       currentDoc.value = doc;
-      currentPath.value = doc.url || "/articles/README.md";
+      currentPath.value = doc.url || "/docs/guia.md";
       document.title = `${doc.title} - mdBlog`;
+      // Remove payload to save memory
       preRenderedScript.remove();
       setTimeout(() => {
         hydrateIslands(islands);

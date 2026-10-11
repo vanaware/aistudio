@@ -18,12 +18,6 @@ export {
   createBrowserIO,
   createMemoryIO,
 } from "../plugin/core/io.ts";
-export {
-  createSWFetchHandler,
-} from "../plugin/adapters/sw.ts";
-export {
-  defaultShell,
-} from "../plugin/core/shell.ts";
 export type {
   IO,
   DocConfig,

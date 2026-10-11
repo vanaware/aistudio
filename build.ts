@@ -28,10 +28,7 @@ export async function build() {
     platform: "browser",
     minify: true,
   });
-  if (!result.success || (result.errors && result.errors.length > 0)) {
-    throw new Error(`Deno.bundle failed: ${JSON.stringify(result.errors)}`);
-  }
-  console.log("📦 [Deno.bundle]: Bundled successfully");
+  console.log("📦 [Deno.bundle result]:", result);
 
   // Copia o index.html da aplicação
   await Deno.copyFile("src/index.html", "dist/index.html");
@@ -44,16 +41,11 @@ export async function build() {
     }
     if (entry.name.startsWith("index-") && entry.name.endsWith(".js")) {
       await Deno.copyFile(`dist/${entry.name}`, "dist/main.js");
-      await Deno.copyFile(`dist/${entry.name}`, "dist/mdblog.js");
     }
     if (entry.name.startsWith("md-transpiler") && entry.name.endsWith(".js")) {
       await Deno.copyFile(`dist/${entry.name}`, "dist/lib/md-transpiler.js");
       await Deno.copyFile(`dist/${entry.name}`, "dist/md-transpiler.js");
     }
-  }
-
-  if (await Deno.stat("dist/main.js").then(() => true).catch(() => false)) {
-    await Deno.copyFile("dist/main.js", "dist/mdblog.js");
   }
 
   // Se o Deno.bundle colocou em dist/lib/md-transpiler-*.js

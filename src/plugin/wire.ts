@@ -61,7 +61,6 @@ export interface WireDoc {
   raw: string;
   url: string;
   renderedAt: number;
-  frontmatter?: Record<string, any>;
 }
 
 /**

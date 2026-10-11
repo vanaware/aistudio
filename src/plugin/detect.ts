@@ -18,7 +18,7 @@ export function isSWControlling(): boolean {
  */
 export function resolveDocPath(
   urlOrPath: string,
-  basePath: string = "/articles",
+  basePath: string = "/docs",
 ): { docPath: string; isDoc: boolean } {
   let pathname = urlOrPath;
   try {
@@ -33,29 +33,20 @@ export function resolveDocPath(
 
   // If path is root or empty
   if (pathname === "" || pathname === "/") {
-    pathname = `${basePath}/index.md`;
+    pathname = `${basePath}/README.md`;
   }
 
-  // Check if it pertains to articles, docs, or ends with .md
+  // Check if it pertains to the documentation base path
   const normalizedBase = basePath.startsWith("/") ? basePath : `/${basePath}`;
-  const isDoc =
-    pathname.startsWith(normalizedBase) ||
-    pathname.startsWith("/articles") ||
-    pathname.startsWith("/docs") ||
-    pathname.endsWith(".md");
-
-  if (!isDoc) {
+  if (!pathname.startsWith(normalizedBase) && !pathname.endsWith(".md")) {
     return { docPath: pathname, isDoc: false };
   }
 
   let docPath = pathname;
   if (!docPath.endsWith(".md")) {
-    if (docPath === "/articles" || docPath === "/articles/" || docPath === "/articles/index") {
-      docPath = "/articles/index.md";
-    } else if (docPath === "/docs" || docPath === "/docs/") {
-      docPath = "/docs/README.md";
-    } else if (docPath === normalizedBase || docPath === `${normalizedBase}/`) {
-      docPath = `${normalizedBase}/index.md`;
+    // If ending with slash or base, default to README.md
+    if (docPath === normalizedBase || docPath === `${normalizedBase}/`) {
+      docPath = `${normalizedBase}/README.md`;
     } else {
       docPath = `${docPath}.md`;
     }
