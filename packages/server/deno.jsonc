@@ -1,0 +1,24 @@
+{
+  "name": "@vanaware/server",
+  "author": "Vanaware",
+  "publish": false,
+  "compilerOptions": {
+    "lib": [
+      "deno.window"
+    ]
+  },
+  "imports": {
+    "@std/http": "jsr:@std/http@^1.1.4",
+    "@std/path": "jsr:@std/path@^1.1.6"
+  },
+  "tasks": {
+    "test": "deno test --no-check --allow-env --allow-net --allow-read tests/**/*test.ts",
+    "check": "deno check src/**/*.{ts,tsx}",
+    "tests": "deno task check && deno task test",
+    "start": "deno run --allow-read --allow-write --allow-env --allow-net --env-file ./src/main.ts",
+    "dev": "deno run --allow-read --allow-write --allow-env --allow-net --env-file --watch ./src/main.ts",
+    "clean": "deno clean && rm -rf ./build && mkdir -p ./build/dist"
+  },
+  "exports": "./src/main.ts",
+  "exclude": ["./build/"]
+}
