@@ -1,5 +1,4 @@
 import { Header } from "./Header.tsx";
-import { CounterCard } from "./CounterCard.tsx";
 import { TaskCard } from "./TaskCard.tsx";
 import { PwaStatusCard } from "./PwaStatusCard.tsx";
 import { Footnote } from "./Footnote.tsx";
@@ -11,11 +10,7 @@ export function App() {
 
       <main class="responsive">
         <div class="grid">
-          <div class="s12 m6">
-            <CounterCard />
-          </div>
-
-          <div class="s12 m6">
+          <div class="s12">
             <TaskCard />
           </div>
 

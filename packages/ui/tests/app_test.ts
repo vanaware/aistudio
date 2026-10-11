@@ -4,11 +4,6 @@ import { APP_VERSION } from "../src/version.ts";
 import { Footnote } from "../src/components/Footnote.tsx";
 import { TaskCard } from "../src/components/TaskCard.tsx";
 import {
-  count,
-  step,
-  square,
-  cube,
-  isEven,
   tasks,
   taskInput,
   taskCategory,
@@ -19,8 +14,12 @@ import {
   addTask,
   toggleTask,
   deleteTask,
+  clearCompletedTasks,
   currentThemeMode,
   toggleThemeMode,
+  loadTasksFromStorage,
+  persistTasks,
+  STORAGE_KEY,
 } from "../src/store.ts";
 
 describe("Application Version & Footnote", () => {
@@ -35,24 +34,7 @@ describe("Application Version & Footnote", () => {
   });
 });
 
-describe("Reactive Signals & Math Operations", () => {
-  it("calculates square, cube and parity based on count", () => {
-    count.value = 4;
-    step.value = 2;
-
-    assertEquals(count.value, 4);
-    assertEquals(square.value, 16);
-    assertEquals(cube.value, 64);
-    assertEquals(isEven.value, true);
-
-    count.value = 5;
-    assertEquals(square.value, 25);
-    assertEquals(cube.value, 125);
-    assertEquals(isEven.value, false);
-  });
-});
-
-describe("Task Mesh Management", () => {
+describe("Task Management & Persistence Signals", () => {
   it("renders TaskCard component function properly", () => {
     const vnode = TaskCard();
     assert(vnode != null);
@@ -104,6 +86,25 @@ describe("Task Mesh Management", () => {
       { id: 102, title: "T2", category: "PWA", completed: true },
     ];
     assertEquals(progressPercent.value, 100);
+  });
+
+  it("clears completed tasks properly", () => {
+    tasks.value = [
+      { id: 201, title: "Active 1", category: "Deno", completed: false },
+      { id: 202, title: "Done 1", category: "PWA", completed: true },
+      { id: 203, title: "Done 2", category: "Preact", completed: true },
+    ];
+
+    clearCompletedTasks();
+    assertEquals(tasks.value.length, 1);
+    assertEquals(tasks.value[0]?.title, "Active 1");
+  });
+
+  it("handles storage operations gracefully in environment", async () => {
+    assertEquals(STORAGE_KEY, "aistudio_tasks");
+    await persistTasks();
+    await loadTasksFromStorage();
+    assert(tasks.value.length > 0);
   });
 });
 

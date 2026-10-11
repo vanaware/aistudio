@@ -1,6 +1,7 @@
 import {
   tasks,
   taskInput,
+  taskCategory,
   taskFilter,
   filteredTasks,
   completedCount,
@@ -8,6 +9,7 @@ import {
   addTask,
   toggleTask,
   deleteTask,
+  clearCompletedTasks,
 } from "../store.ts";
 
 export function TaskCard() {
@@ -17,10 +19,13 @@ export function TaskCard() {
         <div class="max">
           <h5>Gerenciador de Tarefas</h5>
           <div>
-            {completedCount.value} de {tasks.value.length} concluídas ({progressPercent.value}%)
+            {completedCount.value} de {tasks.value.length} concluídas ({progressPercent.value}%) • Sincronizado no IndexedDB
           </div>
         </div>
-        <span class="badge circle primary">{tasks.value.length}</span>
+        <span class="chip primary">
+          <i>storage</i>
+          <span>IndexedDB</span>
+        </span>
       </div>
 
       <div class="space"></div>
@@ -38,6 +43,18 @@ export function TaskCard() {
             onKeyDown={(e: KeyboardEvent) => e.key === "Enter" && addTask()}
           />
           <label>Nova tarefa</label>
+        </div>
+
+        <div class="field border round">
+          <select
+            value={taskCategory.value}
+            onChange={(e: any) => (taskCategory.value = e.target.value)}
+          >
+            <option value="Deno">Deno</option>
+            <option value="PWA">PWA</option>
+            <option value="Preact">Preact</option>
+            <option value="BeerCSS">BeerCSS</option>
+          </select>
         </div>
 
         <button class="circle primary" onClick={addTask} title="Adicionar Tarefa">
@@ -58,14 +75,14 @@ export function TaskCard() {
           onClick={() => (taskFilter.value = "pendentes")}
         >
           <i>pending</i>
-          <span>Pendentes</span>
+          <span>Pendentes ({tasks.value.length - completedCount.value})</span>
         </a>
         <a
           class={taskFilter.value === "concluidas" ? "active" : ""}
           onClick={() => (taskFilter.value = "concluidas")}
         >
           <i>check_circle</i>
-          <span>Concluídas</span>
+          <span>Concluídas ({completedCount.value})</span>
         </a>
       </nav>
 
@@ -92,6 +109,18 @@ export function TaskCard() {
           </button>
         </div>
       ))}
+
+      {completedCount.value > 0 && (
+        <>
+          <div class="space"></div>
+          <div class="row right-align">
+            <button class="chip border" onClick={clearCompletedTasks}>
+              <i>clear_all</i>
+              <span>Limpar concluídas</span>
+            </button>
+          </div>
+        </>
+      )}
     </article>
   );
 }

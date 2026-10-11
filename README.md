@@ -19,7 +19,8 @@ O **aiStudio** é um projeto modelo concebido para comprovar que é possível de
 
 2. **Reatividade Fina com Preact + Signals**:
    - Compilador configurado com `"jsx": "react-jsx"` e `"jsxImportSource": "preact"`, eliminando imports manuais de `h` e `Fragment`.
-   - Gerenciamento de estado 100% reativo utilizando `@preact/signals` centralizado em `src/store.ts`.
+   - Gerenciamento de estado 100% reativo utilizando exclusivamente `@preact/signals` (`signal`, `computed`) em `src/store.ts`, sem hooks (`useState`, `useEffect`).
+   - Persistência durável automática com `idb-keyval` sincronizando as tarefas no IndexedDB do navegador.
    - Renderizações pontuais em nível de nó do DOM, sem re-renderizar árvores inteiras de componentes.
 
 3. **Interface com BeerCSS (Material Design 3)**:
