@@ -9,8 +9,5 @@
     "start": "bash ./install-script.sh && deno task start",
     "lint": "deno task lint",
     "test": "deno task test"
-  },
-  "devDependencies": {
-    "deno": "^2.9.6"
   }
 }

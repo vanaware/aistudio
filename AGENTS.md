@@ -1,15 +1,15 @@
-# Project Guidelines: SyntaxMesh (Deno PWA)
+# Project Guidelines: aiStudio (Deno PWA)
 
-Welcome to the SyntaxMesh project! This file (`AGENTS.md`) is automatically injected into the AI's system instructions. You MUST strictly adhere to the following architectural rules and constraints when modifying or extending this codebase.
+Welcome to the aiStudio project! This file (`AGENTS.md`) is automatically injected into the AI's system instructions. You MUST strictly adhere to the following architectural rules and constraints when modifying or extending this codebase.
 
 ## 1. Runtime & Environment (Pure Deno)
 - **Deno Only**: This project runs entirely on Deno. 
 - **NO Node.js or Local NPM**: Do NOT use `npm install`, do NOT create a `node_modules` directory locally, and do NOT rely on Node.js specific APIs.
-- **Dependency Management**: All dependencies are managed exclusively via `deno.json` using `npm:` and `jsr:` specifiers (e.g., `npm:preact`, `jsr:@std/testing`).
-- **Bundling**: We use Deno's native (and unstable) bundler via the `build.ts` script (`deno run -A --unstable-bundle build.ts`). This script parses `src/index.html` and generates the final output exclusively in the `dist/` directory.
+- **Dependency Management**: All dependencies are managed exclusively via `deno.jsonc` using `npm:` and `jsr:` specifiers (e.g., `npm:preact`, `jsr:@std/testing`).
+- **Bundling**: We use esbuild bundler via the `buildit` package
 
 ## 2. Framework & State Management
-- **Preact**: Use Preact (not React). The configuration in `deno.json` maps `jsx` to `preact`.
+- **Preact**: Use Preact (not React). The configuration in `deno.jsonc` maps `jsx` to `preact`.
 - **State via Signals**: All reactive state MUST use `@preact/signals`. 
   - Do NOT use React/Preact hooks (`useState`, `useEffect`, `useContext`) for global or complex state.
   - Global state, actions, and derived states (`computed`) should be centralized in `src/store.ts`.
@@ -35,15 +35,14 @@ Welcome to the SyntaxMesh project! This file (`AGENTS.md`) is automatically inje
 - **CI/CD**: The project contains a GitHub Actions workflow (`.github/workflows/gh-pages.yml`) that automatically builds and deploys the contents of the `dist/` directory to GitHub Pages.
 
 ## 6. AI Studio Environment Constraints & Bootstrapping
-- **Port 3000**: The development server (Deno's native `file-server` in `dev.ts` / `server.ts`) MUST run on port 3000, as enforced by the AI Studio environment.
+- **Port 3000**: The development server (Deno's native `file-server` in `packages/serve`) MUST run on port 3000, as enforced by the AI Studio environment.
 - **HMR**: Hot Module Replacement is disabled. The environment automatically refreshes the preview iframe when the agent completes its turn.
-- **Node.js Bridge (`package.json` & `install-deno.sh`)**: Although this is a pure Deno project, the underlying AI Studio container natively expects a Node.js ecosystem. We retain `package.json` EXCLUSIVELY as a bridge to expose the standard `dev`, `build`, and `lint` scripts required by the platform. These scripts trigger `install-deno.sh` to download and bootstrap the Deno CLI on the fly during container initialization, enabling our Deno-native workflow.
-- **TaskJuggler (`tj3`)**: The environment is pre-configured to run TaskJuggler. You can execute `tj3` commands directly via the shell to process `.tjp` project files.
+- **Node.js Bridge (`package.json` & `install-deno.sh`)**: Although this is a pure Deno project, the underlying AI Studio container natively expects a Node.js ecosystem. We retain `package.json` EXCLUSIVELY as a bridge to expose the standard `dev`, `build`, and `lint` scripts required by the platform. These scripts trigger `install-script.sh` to download and bootstrap the Deno CLI on the fly during container initialization, enabling our Deno-native workflow.
 
 ## 7. Development Workflow & Continuous Validation
 - **Mandatory Verification**: After executing ANY task, feature request, or to-do list item, you MUST verify the project's integrity by running:
   - Linter & Type Check: `npm run lint` (which runs `deno check` under the hood).
-  - Tests: `deno test -A --unstable-bundle tests/`.
+  - Tests: `deno test -P`.
 - **Proactive Unit Testing**: Whenever you implement new functions, utilities, or complex logic, you MUST proactively create unit tests for them using the `@std/testing/bdd` standard. Do not wait for the user to explicitly ask for tests.
 
 By following these guidelines, we maintain a fast, dependency-free, and cohesive Deno/Preact environment without the overhead of Node.js toolchains or complex CSS bundlers.
