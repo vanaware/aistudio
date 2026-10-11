@@ -33,18 +33,12 @@ export function hydrateIslands(
     if (!Comp) {
       // Tentativa de import dinâmico nativo do navegador para ilha HTML+ES sob demanda
       if (typeof window !== "undefined") {
-        const islandFileName = name.endsWith(".js") ? name : `${name}.js`;
-        const baseName = islandFileName.replace(/\.js$/, "");
-
-        const dynamicImport = new Function("path", "return import(path)");
-        dynamicImport(`./islands/${islandFileName}`)
-          .catch(() => dynamicImport(`./island/${islandFileName}`))
-          .then((mod: any) => {
-            const dynamicComp = mod ? (mod[baseName] || mod.default || mod[Object.keys(mod)[0]]) : null;
+        const islandUrl = `./islands/${name}.js`;
+        import(/* @vite-ignore */ islandUrl)
+          .then((mod) => {
+            const dynamicComp = mod[name] || mod.default;
             if (dynamicComp) {
               registry[name] = dynamicComp;
-              registry[islandFileName] = dynamicComp;
-              registry[baseName] = dynamicComp;
               let dynamicProps = {};
               try {
                 dynamicProps = JSON.parse(el.dataset.props || "{}");
@@ -52,8 +46,6 @@ export function hydrateIslands(
               el.dataset.islandHydrated = "true";
               delete el.dataset.islandMissing;
               hydrate(h(dynamicComp, dynamicProps), el);
-            } else {
-              el.dataset.islandMissing = "true";
             }
           })
           .catch(() => {

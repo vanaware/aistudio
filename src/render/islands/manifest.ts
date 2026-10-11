@@ -1,13 +1,10 @@
 /**
- * Dynamic Islands Resolution.
- * Nenhuma lista fixa de ilhas no código: todas as ilhas são carregadas sob demanda
- * diretamente pelo nome de arquivo existente na pasta islands/ ou island/.
+ * Pure island names manifest.
+ * CRITICAL: This file MUST NOT import Preact, DOM, or UI libraries.
+ * It is safe for consumption in Service Worker, Core, and Headless tests.
  */
+export const islandNames = ["Counter", "SearchBox", "ThemeToggle"] as const;
 
-export function resolveIslandFileName(name: string): string {
-  return name.endsWith(".js") ? name : `${name}.js`;
-}
+export type IslandName = (typeof islandNames)[number];
 
-// Conjunto vazio para retrocompatibilidade: ilhas agora são descobertas dinamicamente pelo arquivo no MD
-export const islandNames: readonly string[] = [];
-export const islandNamesSet: Set<string> = new Set<string>();
+export const islandNamesSet: Set<string> = new Set(islandNames);

@@ -41,7 +41,7 @@ Navegue pelas publicações e guias técnicos disponíveis:
 
 Abaixo temos uma ilha Preact hidratada dinamicamente:
 
-::Counter.js{start: 42, step: 1, label: "Contador Interativo na Home"}
+::Counter{start: 42, step: 1, label: "Contador Interativo na Home"}
 
 ---
 

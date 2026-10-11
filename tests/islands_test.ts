@@ -1,48 +1,46 @@
 import { assertEquals, assert } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
-import { islandNames, islandNamesSet, resolveIslandFileName } from "../src/render/islands/manifest.ts";
+import { islandNames, islandNamesSet } from "../src/render/islands/manifest.ts";
 import { parseMarkdown } from "../src/plugin/core/parse.ts";
 import { mdastToWire } from "../src/plugin/core/to-wire.ts";
 import type { WireIsland } from "../src/plugin/wire.ts";
 
-describe("Islands Architecture (Dynamic File-Based, Zero Fixed Lists)", () => {
-  it("enforces zero hardcoded islands list in code", () => {
-    // Não pode haver lista fixa de ilhas no código
-    assertEquals(islandNames.length, 0, "No fixed island names should exist in code");
-    assertEquals(islandNamesSet.size, 0, "islandNamesSet must be empty (dynamic discovery)");
-    assertEquals(resolveIslandFileName("Counter"), "Counter.js");
-    assertEquals(resolveIslandFileName("DemoWidget.js"), "DemoWidget.js");
+describe("Islands Architecture (Mode B)", () => {
+  it("provides a pure string manifest without UI dependencies", () => {
+    assert(islandNames.includes("Counter"));
+    assert(islandNames.includes("SearchBox"));
+    assert(islandNames.includes("ThemeToggle"));
+    assertEquals(islandNamesSet.has("Counter"), true);
   });
 
-  it("identifies code block islands by filename (```island:Counter.js)", () => {
+  it("identifies code block islands (```island:Counter)", () => {
     const md = `
 # Teste de Ilha
 
-\`\`\`island:Counter.js
+\`\`\`island:Counter
 {"start": 15, "step": 3}
 \`\`\`
 `;
     const root = parseMarkdown(md);
-    // Não precisa de conjunto fixo passado - descobre dinamicamente pelo arquivo
-    const { wire } = mdastToWire(root);
+    const { wire } = mdastToWire(root, islandNamesSet);
 
     assert(wire.c && wire.c.length >= 2);
     const islandNode = wire.c[1] as WireIsland;
     assertEquals(islandNode.t, "i");
-    assertEquals(islandNode.n, "Counter.js");
+    assertEquals(islandNode.n, "Counter");
     assertEquals(islandNode.p?.start, 15);
     assertEquals(islandNode.p?.step, 3);
   });
 
-  it("identifies directive islands by filename (::Counter.js{start: 20})", () => {
-    const md = "::Counter.js{start: 20, step: 2}";
+  it("identifies directive islands (::Counter{start: 20})", () => {
+    const md = "::Counter{start: 20, step: 2}";
     const root = parseMarkdown(md);
-    const { wire } = mdastToWire(root);
+    const { wire } = mdastToWire(root, islandNamesSet);
 
     assert(wire.c && wire.c.length === 1);
     const islandNode = wire.c[0] as WireIsland;
     assertEquals(islandNode.t, "i");
-    assertEquals(islandNode.n, "Counter.js");
+    assertEquals(islandNode.n, "Counter");
     assertEquals(islandNode.p?.start, 20);
     assertEquals(islandNode.p?.step, 2);
   });
@@ -50,7 +48,7 @@ describe("Islands Architecture (Dynamic File-Based, Zero Fixed Lists)", () => {
   it("does not convert regular code blocks to islands", () => {
     const md = "```typescript\nconsole.log(123);\n```";
     const root = parseMarkdown(md);
-    const { wire } = mdastToWire(root);
+    const { wire } = mdastToWire(root, islandNamesSet);
 
     assert(wire.c && wire.c.length === 1);
     const node = wire.c[0] as any;
@@ -59,7 +57,12 @@ describe("Islands Architecture (Dynamic File-Based, Zero Fixed Lists)", () => {
     assertEquals(node.p?.lang, "typescript");
   });
 
-  it("verifies dynamic islands exist as pure HTML+ES files in islands and island folders", async () => {
+  it("implements islands using HTML+ES (htm/preact) with zero-bundle browser capability", async () => {
+    // Verifica que Counter.js utiliza htm/preact como ES Module puro
+    const counterCode = await Deno.readTextFile("src/render/islands/Counter.js");
+    assert(counterCode.includes('from "htm/preact"'));
+    assert(counterCode.includes("html`"));
+
     // Verifica que ilhas estáticas isoladas existem em public/islands como ES Modules
     const demoWidgetCode = await Deno.readTextFile("public/islands/DemoWidget.js");
     assert(demoWidgetCode.includes('from "htm/preact"'));
@@ -69,11 +72,5 @@ describe("Islands Architecture (Dynamic File-Based, Zero Fixed Lists)", () => {
     const publicCounterCode = await Deno.readTextFile("public/islands/Counter.js");
     assert(publicCounterCode.includes('from "htm/preact"'));
     assert(publicCounterCode.includes("html`"));
-
-    // Verifica que a pasta public/island (singular) também contém as ilhas
-    const islandDirStat = await Deno.stat("public/island");
-    assertEquals(islandDirStat.isDirectory, true);
-    const islandCounterCode = await Deno.readTextFile("public/island/Counter.js");
-    assert(islandCounterCode.includes("export function Counter"));
   });
 });
