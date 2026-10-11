@@ -64,7 +64,6 @@ export function Sidebar() {
                       sidebarOpen.value = false;
                     }
                   }}
-                >
                   <i
                     class=${`small ${
                       isActive ? "primary-text" : "surface-variant-text"
