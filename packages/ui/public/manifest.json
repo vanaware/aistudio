@@ -1,6 +1,6 @@
 {
-  "name": "SyntaxMesh",
-  "short_name": "SyntaxMesh",
+  "name": "AiStudio",
+  "short_name": "AiStudio",
   "description": "Progressive Web App built with Deno, Preact, Signals and pure BeerCSS",
   "start_url": "./",
   "scope": "./",

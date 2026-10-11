@@ -98,15 +98,17 @@ export const progressPercent = computed<number>(() => {
 export function toggleThemeMode() {
   const modes: Array<"auto" | "light" | "dark"> = ["light", "dark", "auto"];
   const nextIdx = (modes.indexOf(currentThemeMode.value) + 1) % modes.length;
-  const nextMode = modes[nextIdx];
+  const nextMode = modes[nextIdx] ?? "auto";
   currentThemeMode.value = nextMode;
 
-  const win = window as any;
-  if (typeof win.ui === "function") {
-    win.ui("mode", nextMode);
-  } else {
-    document.body.classList.remove("light", "dark", "auto");
-    document.body.classList.add(nextMode);
+  if (typeof globalThis !== "undefined" && "document" in globalThis) {
+    const win = globalThis as any;
+    if (typeof win.ui === "function") {
+      win.ui("mode", nextMode);
+    } else if (win.document?.body) {
+      win.document.body.classList.remove("light", "dark", "auto");
+      win.document.body.classList.add(nextMode);
+    }
   }
 }
 
