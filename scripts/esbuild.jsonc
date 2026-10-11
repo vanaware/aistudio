@@ -1,0 +1,63 @@
+{
+  "$schema": "https://vanaware.github.io/buildit/schema/esbuild.json",
+  "versionPaths": [
+    "packages/ui/public/version.js",
+    "packages/ui/src/version.ts"
+  ],
+  "forcepackagesversion": true,
+  "targets": {
+    "ui": {
+      "default": true,
+      "srcdir": "packages/ui/src",
+      "distdir": "packages/server/build/dist",
+      "clean": {
+        "includes": ["*"]
+      },
+      "copyFiles": [
+        {
+          "basedir": "packages/ui/public"
+        }
+      ],
+      "entryPoints": ["main.tsx"],
+      "outfile": "main.js",
+      "platform": "browser",
+      "format": "esm",
+      "bundle": true,
+      "minify": false,
+      "sourcemap": "linked",
+      "drop": ["debugger"],
+      "conditions": ["browser"],
+      "metafile": true,
+      "write": true,
+      "legalComments": "eof",
+      "keepNames": true,
+      "splitting": false,
+      "banner": {
+        "js": "/*!\n * aiStudio v__APP_VERSION__\n * (c) 2026 Vanaware - MIT License\n */\n"
+      }
+    },
+    "sw": {
+      "default": true,
+      "srcdir": "packages/ui/src",
+      "distdir": "packages/server/build/dist",
+      "clean": ["sw.js", "sw.js.map"],
+      "entryPoints": ["sw.ts"],
+      "outfile": "sw.js",
+      "platform": "browser",
+      "format": "esm",
+      "bundle": true,
+      "minify": false,
+      "sourcemap": "external",
+      "drop": ["debugger"],
+      "conditions": ["browser"],
+      "metafile": true,
+      "write": true,
+      "legalComments": "eof",
+      "keepNames": true,
+      "splitting": false,
+      "banner": {
+        "js": "/*!\n * aiStudio v__APP_VERSION__\n * (c) 2026 Vanaware - MIT License\n */\n"
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://vanaware.github.io/buildit/schema/export.json",
+  "project": "aiStudio",
+  "modes": {
+    "docs": {
+      "outputFile": "snapshots/docs.md",
+      "includes": [
+        "docs/**/*.{md,txt}",
+        "{README.md,LICENSE,.tool-versions,CHANGELOG.md}"
+      ],
+      "excludes": [
+        "**/node_modules/**",
+        "**/.git/**"
+      ],
+      "includeVersion": false,
+      "customInstruction": "O texto abaixo contém a DOCUMENTAÇÃO e diretrizes arquiteturais do projeto.",
+      "default": true
+    },
+    "server": {
+      "outputFile": "snapshots/server.md",
+      "includes": [
+        "packages/server/{src,tests}/**/*.{tsx,jsx,js,ts,css,html,json,jsonc,yaml,yml,md}",
+        "packages/server/{deno.json,deno.jsonc,README.md,.env.example}"
+      ],
+      "excludes": [
+        "**/node_modules/**",
+        "**/.git/**"
+      ],
+      "includeVersion": true,
+      "customInstruction": "O texto abaixo contém os arquivos de configuração e execução do SERVER @vanaware/server",
+      "default": true
+    },
+    "utils": {
+      "outputFile": "snapshots/utils.md",
+      "includes": [
+        "{deno.json,deno.jsonc,README.md,.env.example,.tools-versions,CHANGELOG.md}",
+        "scripts/**/*.{ts,jsonc}",
+        ".github/workflows/**/*.{yaml,yml}"
+      ],
+      "excludes": [
+        "**/node_modules/**",
+        "**/.git/**"
+      ],
+      "includeVersion": true,
+      "customInstruction": "O texto abaixo contém o código de utilidades usadas no projeto como scripts de build e configuração do CI/CD.",
+      "default": true
+    },
+    "ui": {
+      "outputFile": "snapshots/ui.md",
+      "includes": [
+        "packages/ui/{public,src,tests,dist}/**/*.{tsx,jsx,js,ts,css,html,json,jsonc,yaml,yml,md,svg}",
+        "packages/ui/{deno.json,deno.jsonc,README.md}"
+      ],
+      "excludes": [
+        "**/node_modules/**",
+        "**/.git/**"
+      ],
+      "includeVersion": true,
+      "customInstruction": "O texto abaixo contém os arquivos de CÓDIGO FONTE principais da aplicação.",
+      "default": true
+    }
+  }
+}

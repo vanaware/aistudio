@@ -1,12 +1,16 @@
 {
   "name": "vanaware-aistudio-deno",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "./install-deno.sh && deno run -A --unstable-bundle build.ts && deno run -A dev.ts",
-    "build": "./install-deno.sh && deno run -A --unstable-bundle build.ts",
-    "lint": "deno check --unstable-bundle dev.ts build.ts server.ts src/sw.ts src/main.tsx src/components/*.tsx src/store.ts tests/app_test.ts",
-    "test": "deno test -A --unstable-bundle tests/"
+    "dev": "bash ./install-script.sh && deno task esbuild && deno task dev",
+    "build": "bash ./install-script.sh && deno task esbuild",
+    "start": "bash ./install-script.sh && deno task start",
+    "lint": "deno task lint",
+    "test": "deno task test"
+  },
+  "devDependencies": {
+    "deno": "^2.9.6"
   }
 }

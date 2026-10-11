@@ -1,0 +1,51 @@
+{
+  "$schema": "https://vanaware.github.io/buildit/schema/denobuild.json",
+  "versionPaths": [
+    "packages/ui/public/version.js",
+    "packages/ui/src/version.ts"
+  ],
+  "forcepackagesversion": true,
+  "targets": {
+    "ui": {
+      "default": true,
+      "srcdir": "packages/ui/src",
+      "distdir": "packages/server/build/dist",
+      "clean": {
+        "includes": ["*"]
+      },
+      "copyFiles": [
+        {
+          "basedir": "packages/ui/public"
+        }
+      ],
+      "entryPoints": ["main.tsx"],
+      "outfile": "main.js",
+      "platform": "browser",
+      "format": "esm",
+      "minify": false,
+      "sourcemap": "linked",
+      "keepNames": true,
+      "codeSplitting": false,
+      "packages": "bundle",
+      "inlineImports": true
+    },
+    "sw": {
+      "default": true,
+      "srcdir": "packages/ui/src",
+      "distdir": "packages/server/build/dist",
+      "clean": {
+        "includes": ["sw.js", "sw.js.map"]
+      },
+      "entryPoints": ["sw.ts"],
+      "outfile": "sw.js",
+      "platform": "browser",
+      "format": "esm",
+      "minify": false,
+      "sourcemap": "external",
+      "keepNames": true,
+      "codeSplitting": false,
+      "packages": "bundle",
+      "inlineImports": true
+    }
+  }
+}
