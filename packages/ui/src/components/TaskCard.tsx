@@ -1,11 +1,15 @@
 import {
   tasks,
   taskInput,
+  categories,
   taskCategory,
   taskFilter,
   filteredTasks,
   completedCount,
   progressPercent,
+  isAddingCategory,
+  newCategoryInput,
+  addCategory,
   addTask,
   toggleTask,
   deleteTask,
@@ -48,16 +52,32 @@ export function TaskCard() {
         </div>
 
         <div class="s8 m3">
-          <div class="field border round fill no-margin">
+          <div class="field suffix border round fill no-margin">
             <select
               value={taskCategory.value}
-              onChange={(e: any) => (taskCategory.value = e.target.value)}
+              onChange={(e: any) => {
+                if (e.target.value === "__new__") {
+                  isAddingCategory.value = true;
+                } else {
+                  taskCategory.value = e.target.value;
+                }
+              }}
             >
-              <option value="Deno">Deno</option>
-              <option value="PWA">PWA</option>
-              <option value="Preact">Preact</option>
-              <option value="BeerCSS">BeerCSS</option>
+              {categories.value.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+              <option value="__new__">+ Nova categoria...</option>
             </select>
+            <button
+              class="circle transparent"
+              type="button"
+              onClick={() => (isAddingCategory.value = true)}
+              title="Incluir nova categoria"
+            >
+              <i>add</i>
+            </button>
           </div>
         </div>
 
@@ -132,6 +152,39 @@ export function TaskCard() {
           </div>
         </>
       )}
+
+      {/* Modal elegante para criação de novas categorias */}
+      <dialog class={isAddingCategory.value ? "active" : ""}>
+        <h5>Nova Categoria</h5>
+        <div>Crie uma categoria personalizada para organizar suas tarefas</div>
+        <div class="space"></div>
+        <div class="field label border round fill">
+          <input
+            type="text"
+            value={newCategoryInput.value}
+            onInput={(e: any) => (newCategoryInput.value = e.target.value)}
+            onKeyDown={(e: KeyboardEvent) => e.key === "Enter" && addCategory()}
+            placeholder="Ex: API, DevOps, Testes..."
+          />
+          <label>Nome da categoria</label>
+        </div>
+        <div class="space"></div>
+        <nav class="right-align">
+          <button
+            class="border"
+            type="button"
+            onClick={() => {
+              isAddingCategory.value = false;
+              newCategoryInput.value = "";
+            }}
+          >
+            Cancelar
+          </button>
+          <button class="primary" type="button" onClick={() => addCategory()}>
+            Salvar
+          </button>
+        </nav>
+      </dialog>
     </article>
   );
 }

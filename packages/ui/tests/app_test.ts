@@ -6,6 +6,7 @@ import { TaskCard } from "../src/components/TaskCard.tsx";
 import {
   tasks,
   taskInput,
+  categories,
   taskCategory,
   taskFilter,
   filteredTasks,
@@ -15,6 +16,7 @@ import {
   toggleTask,
   deleteTask,
   clearCompletedTasks,
+  addCategory,
   currentThemeMode,
   toggleThemeMode,
   loadTasksFromStorage,
@@ -98,6 +100,14 @@ describe("Task Management & Persistence Signals", () => {
     clearCompletedTasks();
     assertEquals(tasks.value.length, 1);
     assertEquals(tasks.value[0]?.title, "Active 1");
+  });
+
+  it("adds new dynamic categories properly", () => {
+    const initialCatsCount = categories.value.length;
+    addCategory("DevOps");
+    assert(categories.value.includes("DevOps"));
+    assertEquals(taskCategory.value, "DevOps");
+    assertEquals(categories.value.length, initialCatsCount + 1);
   });
 
   it("handles storage operations gracefully in environment", async () => {

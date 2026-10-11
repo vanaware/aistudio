@@ -11,8 +11,9 @@ export const currentThemeMode = signal<"auto" | "light" | "dark">("auto");
 export const isStorageLoaded = signal<boolean>(false);
 
 export function initEnvironmentListeners() {
-  // Load persisted tasks from IndexedDB
+  // Load persisted data from IndexedDB
   loadTasksFromStorage();
+  loadCategoriesFromStorage();
 
   if (typeof window === "undefined") return;
 
@@ -52,11 +53,17 @@ export function initEnvironmentListeners() {
 export interface Task {
   id: number;
   title: string;
-  category: "Deno" | "PWA" | "Preact" | "BeerCSS";
+  category: string;
   completed: boolean;
 }
 
 export const STORAGE_KEY = "aistudio_tasks";
+export const CATEGORIES_STORAGE_KEY = "aistudio_categories";
+
+export const defaultCategories: string[] = ["Deno", "PWA", "Preact", "BeerCSS"];
+export const categories = signal<string[]>(defaultCategories);
+export const isAddingCategory = signal<boolean>(false);
+export const newCategoryInput = signal<string>("");
 
 const defaultTasks: Task[] = [
   { id: 1, title: "Configurar Deno.bundle nativo", category: "Deno", completed: true },
@@ -69,7 +76,7 @@ const defaultTasks: Task[] = [
 
 export const tasks = signal<Task[]>(defaultTasks);
 export const taskInput = signal<string>("");
-export const taskCategory = signal<"Deno" | "PWA" | "Preact" | "BeerCSS">("Deno");
+export const taskCategory = signal<string>("Deno");
 export const taskFilter = signal<"todas" | "pendentes" | "concluidas">("todas");
 
 export const filteredTasks = computed<Task[]>(() => {
@@ -120,6 +127,28 @@ export async function persistTasks(): Promise<void> {
   }
 }
 
+export async function loadCategoriesFromStorage(): Promise<void> {
+  if (typeof indexedDB === "undefined") return;
+  try {
+    const stored = await get<string[]>(CATEGORIES_STORAGE_KEY);
+    if (stored && Array.isArray(stored) && stored.length > 0) {
+      const merged = Array.from(new Set([...defaultCategories, ...stored]));
+      categories.value = merged;
+    }
+  } catch (err) {
+    console.warn("[Store] Erro ao carregar categorias do IndexedDB:", err);
+  }
+}
+
+export async function persistCategories(): Promise<void> {
+  if (typeof indexedDB === "undefined") return;
+  try {
+    await set(CATEGORIES_STORAGE_KEY, categories.value);
+  } catch (err) {
+    console.warn("[Store] Erro ao persistir categorias no IndexedDB:", err);
+  }
+}
+
 // ==========================================
 // Theme & PWA Actions
 // ==========================================
@@ -150,8 +179,20 @@ export function promptInstallPWA() {
 }
 
 // ==========================================
-// Task Management Actions
+// Task & Category Management Actions
 // ==========================================
+export function addCategory(name?: string) {
+  const catName = (name || newCategoryInput.value).trim();
+  if (!catName) return;
+  if (!categories.value.includes(catName)) {
+    categories.value = [...categories.value, catName];
+    persistCategories();
+  }
+  taskCategory.value = catName;
+  newCategoryInput.value = "";
+  isAddingCategory.value = false;
+}
+
 export function addTask() {
   const text = taskInput.value.trim();
   if (!text) return;

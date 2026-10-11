@@ -1,6 +1,5 @@
 import { Header } from "./Header.tsx";
 import { TaskCard } from "./TaskCard.tsx";
-import { PwaStatusCard } from "./PwaStatusCard.tsx";
 import { Footnote } from "./Footnote.tsx";
 
 export function App() {
@@ -9,15 +8,7 @@ export function App() {
       <Header />
 
       <main class="responsive">
-        <div class="grid">
-          <div class="s12">
-            <TaskCard />
-          </div>
-
-          <div class="s12">
-            <PwaStatusCard />
-          </div>
-        </div>
+        <TaskCard />
 
         <div class="space"></div>
 
