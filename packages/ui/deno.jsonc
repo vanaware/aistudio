@@ -1,6 +1,6 @@
 {
   "name": "@vanaware/aiStudio",
-  "version": "0.0.10#mv4cu0s3",
+  "version": "0.0.15#mv4d64gg",
   "description": "Progressive Web App built with Deno, Preact, Signals and pure BeerCSS",
   "author": "Vanaware",
   "license": "MIT",
@@ -10,10 +10,9 @@
     "lib": ["deno.window", "dom", "dom.iterable"]
   },
   "imports": {
-    "preact": "npm:preact@10.25.4",
-    "preact/jsx-runtime": "npm:preact@10.25.4/jsx-runtime",
-    "preact/": "npm:preact@10.25.4/",
-    "@preact/signals": "npm:@preact/signals@2.0.1"
+    "preact": "npm:preact@^10.28.0",
+    "preact/jsx-runtime": "npm:preact@^10.28.0/jsx-runtime",
+    "@preact/signals": "npm:@preact/signals@^1.3.0"
   },
   "tasks": {
     "test": "deno test -P",
