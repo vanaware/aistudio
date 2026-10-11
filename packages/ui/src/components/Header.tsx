@@ -1,12 +1,22 @@
 import { isOnline, installPrompt, currentThemeMode, promptInstallPWA, toggleThemeMode } from "../store.ts";
+import { APP_VERSION } from "../version.ts";
 
 export function Header() {
+  const versionTag = APP_VERSION
+    ? (APP_VERSION.startsWith("v") ? APP_VERSION : `v${APP_VERSION}`)
+    : "";
+
   return (
     <nav class="top border fill primary-container">
       <button class="circle transparent">
         <i>lock</i>
       </button>
-      <h6 class="max bold">SyntaxMesh</h6>
+      <h6 class="max bold row no-wrap middle">
+        <span>aiStudio</span>
+        {versionTag && (
+          <span class="chip tiny secondary">{versionTag}</span>
+        )}
+      </h6>
 
       {/* Online / Offline status chip */}
       <span class={isOnline.value ? "chip success" : "chip error"}>

@@ -1,5 +1,6 @@
 {
-  "name": "@mdblog/server",
+  "name": "@vanaware/server",
+  "author": "Vanaware",
   "publish": false,
   "compilerOptions": {
     "lib": [

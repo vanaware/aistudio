@@ -1,14 +1,20 @@
+import { APP_VERSION } from "../version.ts";
+
 export function PwaStatusCard() {
+  const displayVersion = APP_VERSION
+    ? (APP_VERSION.startsWith("v") ? APP_VERSION : `v${APP_VERSION}`)
+    : "v1.0";
+
   return (
     <article class="border round medium-elevate">
       <div class="row">
         <div class="max">
           <h5 class="bold">Arquitetura PWA & Deno</h5>
-          <p class="secondary-text">Empacotado nativamente com Deno.bundle (--unstable-bundle)</p>
+          <p class="secondary-text">Versão {displayVersion} • Empacotado com Deno & esbuild</p>
         </div>
         <span class="chip tertiary">
           <i>verified</i>
-          <span>v1.0</span>
+          <span>{displayVersion}</span>
         </span>
       </div>
 

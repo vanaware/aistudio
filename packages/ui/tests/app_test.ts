@@ -1,5 +1,6 @@
 import { assertEquals, assert } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
+import { APP_VERSION } from "../src/version.ts";
 import {
   count,
   step,
@@ -19,6 +20,12 @@ import {
   currentThemeMode,
   toggleThemeMode,
 } from "../src/store.ts";
+
+describe("Application Version", () => {
+  it("exports APP_VERSION as string from src/version.ts", () => {
+    assertEquals(typeof APP_VERSION, "string");
+  });
+});
 
 describe("Reactive Signals & Math Operations", () => {
   it("calculates square, cube and parity based on count", () => {
