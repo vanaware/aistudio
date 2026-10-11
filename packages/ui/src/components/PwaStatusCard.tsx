@@ -1,31 +1,19 @@
-import { APP_VERSION } from "../version.ts";
-
 export function PwaStatusCard() {
-  const displayVersion = APP_VERSION
-    ? (APP_VERSION.startsWith("v") ? APP_VERSION : `v${APP_VERSION}`)
-    : "v1.0";
-
   return (
-    <article class="border round medium-elevate">
-      <div class="row">
-        <div class="max">
-          <h5 class="bold">Arquitetura PWA & Deno</h5>
-          <p class="secondary-text">Versão {displayVersion} • Empacotado com Deno & esbuild</p>
-        </div>
-        <span class="chip tertiary">
-          <i>verified</i>
-          <span>{displayVersion}</span>
-        </span>
-      </div>
+    <article class="border">
+      <h5>Arquitetura PWA & Deno</h5>
+      <div>Construído com Deno, Preact, Signals e BeerCSS puro</div>
+
+      <div class="space"></div>
 
       <div class="grid">
         <div class="s12 m6">
-          <article class="fill surface-container round">
+          <article class="surface-container">
             <div class="row">
               <i>cloud_done</i>
               <div class="max">
-                <h6 class="bold">Service Worker</h6>
-                <p class="secondary-text">Cache offline e interceptação de rotas</p>
+                <h6>Service Worker</h6>
+                <div>Cache offline e rotas</div>
               </div>
               <span class="chip success">Ativo</span>
             </div>
@@ -33,25 +21,25 @@ export function PwaStatusCard() {
         </div>
 
         <div class="s12 m6">
-          <article class="fill surface-container round">
+          <article class="surface-container">
             <div class="row">
               <i>devices</i>
               <div class="max">
-                <h6 class="bold">Web Manifest</h6>
-                <p class="secondary-text">Instalável em desktop e mobile</p>
+                <h6>Web Manifest</h6>
+                <div>Instalável como PWA</div>
               </div>
-              <span class="chip primary">PWA Ready</span>
+              <span class="chip primary">PWA</span>
             </div>
           </article>
         </div>
 
         <div class="s12 m6">
-          <article class="fill surface-container round">
+          <article class="surface-container">
             <div class="row">
               <i>palette</i>
               <div class="max">
-                <h6 class="bold">BeerCSS 5.0.3</h6>
-                <p class="secondary-text">Material Design 3 puro sem CSS customizado</p>
+                <h6>BeerCSS 5</h6>
+                <div>Material Design 3 puro</div>
               </div>
               <span class="chip">Puro</span>
             </div>
@@ -59,12 +47,12 @@ export function PwaStatusCard() {
         </div>
 
         <div class="s12 m6">
-          <article class="fill surface-container round">
+          <article class="surface-container">
             <div class="row">
               <i>electric_bolt</i>
               <div class="max">
-                <h6 class="bold">Preact Signals</h6>
-                <p class="secondary-text">Reatividade de alta performance</p>
+                <h6>Preact Signals</h6>
+                <div>Reatividade de alta performance</div>
               </div>
               <span class="chip secondary">Signals</span>
             </div>

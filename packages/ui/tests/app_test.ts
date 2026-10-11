@@ -1,6 +1,8 @@
 import { assertEquals, assert } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 import { APP_VERSION } from "../src/version.ts";
+import { Footnote } from "../src/components/Footnote.tsx";
+import { TaskCard } from "../src/components/TaskCard.tsx";
 import {
   count,
   step,
@@ -21,9 +23,15 @@ import {
   toggleThemeMode,
 } from "../src/store.ts";
 
-describe("Application Version", () => {
+describe("Application Version & Footnote", () => {
   it("exports APP_VERSION as string from src/version.ts", () => {
     assertEquals(typeof APP_VERSION, "string");
+  });
+
+  it("renders Footnote component function properly", () => {
+    const vnode = Footnote();
+    assert(vnode != null);
+    assertEquals(vnode.type, "footer");
   });
 });
 
@@ -45,6 +53,12 @@ describe("Reactive Signals & Math Operations", () => {
 });
 
 describe("Task Mesh Management", () => {
+  it("renders TaskCard component function properly", () => {
+    const vnode = TaskCard();
+    assert(vnode != null);
+    assertEquals(vnode.type, "article");
+  });
+
   it("adds, toggles, filters and deletes tasks properly", () => {
     const initialLen = tasks.value.length;
 

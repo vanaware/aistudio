@@ -1,27 +1,32 @@
 import { Header } from "./Header.tsx";
 import { CounterCard } from "./CounterCard.tsx";
-import { TaskMeshCard } from "./TaskMeshCard.tsx";
+import { TaskCard } from "./TaskCard.tsx";
 import { PwaStatusCard } from "./PwaStatusCard.tsx";
+import { Footnote } from "./Footnote.tsx";
 
 export function App() {
   return (
     <div>
       <Header />
 
-      <main class="responsive padding">
+      <main class="responsive">
         <div class="grid">
           <div class="s12 m6">
             <CounterCard />
           </div>
 
           <div class="s12 m6">
-            <TaskMeshCard />
+            <TaskCard />
           </div>
 
           <div class="s12">
             <PwaStatusCard />
           </div>
         </div>
+
+        <div class="space"></div>
+
+        <Footnote />
       </main>
     </div>
   );

@@ -1,6 +1,6 @@
 {
   "name": "@vanaware/aiStudio",
-  "version": "0.0.30#mv4dnd74",
+  "version": "0.0.45#mv4e7c4m",
   "description": "Progressive Web App built with Deno, Preact, Signals and pure BeerCSS",
   "author": "Vanaware",
   "license": "MIT",

@@ -1,41 +1,30 @@
 import { isOnline, installPrompt, currentThemeMode, promptInstallPWA, toggleThemeMode } from "../store.ts";
-import { APP_VERSION } from "../version.ts";
 
 export function Header() {
-  const versionTag = APP_VERSION
-    ? (APP_VERSION.startsWith("v") ? APP_VERSION : `v${APP_VERSION}`)
-    : "";
-
   return (
-    <nav class="top border fill primary-container">
-      <button class="circle transparent">
-        <i>lock</i>
-      </button>
-      <h6 class="max bold row no-wrap middle">
-        <span>aiStudio</span>
-        {versionTag && (
-          <span class="chip tiny secondary">{versionTag}</span>
-        )}
-      </h6>
-
-      {/* Online / Offline status chip */}
-      <span class={isOnline.value ? "chip success" : "chip error"}>
-        <i>{isOnline.value ? "wifi" : "wifi_off"}</i>
-        <span>{isOnline.value ? "Online" : "Offline"}</span>
-      </span>
-
-      {/* PWA Install button */}
-      {installPrompt.value && (
-        <button class="chip primary" onClick={promptInstallPWA}>
-          <i>download</i>
-          <span>Instalar PWA</span>
+    <header class="primary-container">
+      <nav>
+        <button class="circle transparent">
+          <i>lock</i>
         </button>
-      )}
+        <h5 class="max">aiStudio</h5>
 
-      {/* Theme Toggle Button */}
-      <button class="circle transparent" onClick={toggleThemeMode} title={`Tema atual: ${currentThemeMode.value}`}>
-        <i>{currentThemeMode.value === "dark" ? "dark_mode" : currentThemeMode.value === "light" ? "light_mode" : "brightness_auto"}</i>
-      </button>
-    </nav>
+        <span class={isOnline.value ? "chip success" : "chip error"}>
+          <i>{isOnline.value ? "wifi" : "wifi_off"}</i>
+          <span>{isOnline.value ? "Online" : "Offline"}</span>
+        </span>
+
+        {installPrompt.value && (
+          <button class="chip primary" onClick={promptInstallPWA} title="Instalar PWA">
+            <i>download</i>
+            <span>Instalar</span>
+          </button>
+        )}
+
+        <button class="circle transparent" onClick={toggleThemeMode} title={`Tema: ${currentThemeMode.value}`}>
+          <i>{currentThemeMode.value === "dark" ? "dark_mode" : currentThemeMode.value === "light" ? "light_mode" : "brightness_auto"}</i>
+        </button>
+      </nav>
+    </header>
   );
 }
