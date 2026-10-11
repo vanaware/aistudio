@@ -34,32 +34,43 @@ export function TaskCard() {
 
       <div class="space"></div>
 
-      <div class="row">
-        <div class="field label border round fill max">
-          <input
-            type="text"
-            value={taskInput.value}
-            onInput={(e: any) => (taskInput.value = e.target.value)}
-            onKeyDown={(e: KeyboardEvent) => e.key === "Enter" && addTask()}
-          />
-          <label>Nova tarefa</label>
+      <div class="grid">
+        <div class="s12 m7">
+          <div class="field label border round fill no-margin">
+            <input
+              type="text"
+              value={taskInput.value}
+              onInput={(e: any) => (taskInput.value = e.target.value)}
+              onKeyDown={(e: KeyboardEvent) => e.key === "Enter" && addTask()}
+            />
+            <label>Nova tarefa</label>
+          </div>
         </div>
 
-        <div class="field border round">
-          <select
-            value={taskCategory.value}
-            onChange={(e: any) => (taskCategory.value = e.target.value)}
+        <div class="s8 m3">
+          <div class="field border round fill no-margin">
+            <select
+              value={taskCategory.value}
+              onChange={(e: any) => (taskCategory.value = e.target.value)}
+            >
+              <option value="Deno">Deno</option>
+              <option value="PWA">PWA</option>
+              <option value="Preact">Preact</option>
+              <option value="BeerCSS">BeerCSS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="s4 m2">
+          <button
+            class="responsive primary fill round no-margin"
+            onClick={addTask}
+            title="Adicionar Tarefa"
           >
-            <option value="Deno">Deno</option>
-            <option value="PWA">PWA</option>
-            <option value="Preact">Preact</option>
-            <option value="BeerCSS">BeerCSS</option>
-          </select>
+            <i>add</i>
+            <span>Criar</span>
+          </button>
         </div>
-
-        <button class="circle primary" onClick={addTask} title="Adicionar Tarefa">
-          <i>add</i>
-        </button>
       </div>
 
       <nav class="tabs">
